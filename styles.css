@@ -1,0 +1,298 @@
+/* ============== PROMĚNNÉ ============== */
+:root {
+  --bg: #0f0f1a;
+  --bg-2: #1a1a2e;
+  --card: rgba(255, 255, 255, 0.06);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --accent: #7c5cff;
+  --accent-2: #ff5c8a;
+  --text: #f4f4f8;
+  --muted: #9ea0b5;
+  --ok: #22c55e;
+  --err: #ef4444;
+  --radius: 18px;
+}
+
+/* ============== ZÁKLAD ============== */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, #2a1e5c 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, #5c1e44 0%, transparent 55%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
+}
+
+.screen { display: none; padding-top: 28px; }
+.screen.active { display: block; animation: fade .25s ease; }
+@keyframes fade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.hidden { display: none !important; }
+
+/* ============== HOME ============== */
+.hero { text-align: center; margin: 30px 0 40px; }
+.hero h1 {
+  font-size: 2.6rem; margin: 0;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.subtitle { color: var(--muted); margin: 6px 0 0; }
+
+.mode-cards { display: grid; gap: 16px; }
+.mode-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 22px;
+  border-radius: var(--radius);
+  text-align: left;
+  cursor: pointer;
+  backdrop-filter: blur(20px);
+  transition: transform .15s, border-color .15s;
+}
+.mode-card:active { transform: scale(.98); }
+.mode-card:hover { border-color: var(--accent); }
+.mode-card .emoji { font-size: 2rem; }
+.mode-card h2 { margin: 8px 0 4px; }
+.mode-card p { margin: 0; color: var(--muted); }
+
+/* ============== GAME HEADER ============== */
+.game-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+}
+.progress { flex: 1; }
+.progress-bar {
+  height: 6px; background: var(--card); border-radius: 4px;
+  overflow: hidden; margin-top: 6px;
+}
+#progress-fill {
+  height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width .3s;
+}
+#progress-text { font-size: .85rem; color: var(--muted); }
+.score-badge {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* ============== QUESTION + CHIPS ============== */
+.category-chip {
+  display: inline-block; padding: 4px 12px; border-radius: 999px;
+  background: rgba(124, 92, 255, .18); color: #c9bfff;
+  font-size: .8rem;
+}
+#question-text { font-size: 1.4rem; line-height: 1.4; margin: 0 0 24px; }
+
+/* ============== ANSWERS (sólo) ============== */
+.answers { display: grid; gap: 10px; }
+.answer-btn {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 16px;
+  text-align: left;
+  border-radius: 14px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform .1s, background .2s, border-color .2s;
+}
+.answer-btn:active { transform: scale(.98); }
+.answer-btn.correct { background: rgba(34,197,94,.18); border-color: var(--ok); }
+.answer-btn.wrong   { background: rgba(239,68,68,.18); border-color: var(--err); }
+.answer-btn:disabled { cursor: default; opacity: .8; }
+
+/* ============== MODERÁTOR ============== */
+.moderator-panel { display: grid; gap: 18px; }
+.correct-answer {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  padding: 14px;
+  border-radius: 14px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.correct-answer .label { color: var(--muted); font-size: .85rem; }
+.blurred { filter: blur(7px); transition: filter .3s; font-weight: 600; }
+.blurred.revealed { filter: none; color: var(--ok); }
+
+.hints h3 { margin: 0 0 10px; font-size: 1rem; }
+.hint-item {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hint-item button {
+  flex: 1; background: transparent; border: 0;
+  color: var(--text); text-align: left; cursor: pointer; font-size: .95rem;
+}
+.hint-item.used { background: rgba(124,92,255,.12); border-color: var(--accent); }
+.hint-text {
+  color: var(--muted); font-size: .9rem; margin-top: 6px;
+  display: none; width: 100%;
+}
+.hint-item.used .hint-text { display: block; color: #d8d2ff; }
+
+.mod-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ============== BUTTONS ============== */
+.primary-btn, .ghost-btn {
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform .1s, opacity .2s;
+}
+.primary-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white; border: 0; flex: 1;
+}
+.ghost-btn {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+}
+.primary-btn:active, .ghost-btn:active { transform: scale(.97); }
+
+/* ============== RESULT ============== */
+.result-card { text-align: center; padding: 40px 20px; }
+.big-score {
+  font-size: 3rem; margin: 18px 0; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; color: transparent;
+}
+
+/* ============== TIMER ============== */
+.timer-badge {
+  background: rgba(239,68,68,.15);
+  border: 1px solid var(--err);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  color: #ffb4b4;
+  font-size: .85rem;
+}
+.timer-badge.warn { animation: pulse .8s infinite; }
+@keyframes pulse { 50% { transform: scale(1.08); } }
+
+/* ============== META ROW + DIFFICULTY ============== */
+.meta-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+.difficulty-chip { font-size: .8rem; color: var(--accent-2); letter-spacing: 2px; }
+
+/* ============== SOLO FEEDBACK ============== */
+.solo-feedback {
+  padding: 18px; border-radius: 14px; text-align: center; margin-top: 16px;
+  background: var(--card); border: 1px solid var(--card-border);
+}
+.solo-feedback.ok  { background: rgba(34,197,94,.15); border-color: var(--ok); }
+.solo-feedback.err { background: rgba(239,68,68,.15); border-color: var(--err); }
+.solo-feedback h3 { margin: 0 0 6px; font-size: 1.3rem; }
+
+/* ============== TEAMS SETUP ============== */
+.teams-editor { display: grid; gap: 10px; margin: 16px 0; }
+.team-row {
+  display: flex; gap: 8px; align-items: center;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  padding: 10px;
+  border-radius: 12px;
+}
+.team-row input {
+  flex: 1; background: transparent; border: 0;
+  color: var(--text); font-size: 1rem;
+}
+.team-color { width: 16px; height: 16px; border-radius: 50%; }
+.team-row button {
+  background: transparent; border: 0; color: var(--err);
+  cursor: pointer; font-size: 1.2rem;
+}
+
+/* ============== TEAMS SCORING ============== */
+.teams-scoring {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  padding: 14px; border-radius: 14px;
+}
+#teams-buttons { display: grid; gap: 8px; margin-top: 10px; }
+.team-score-btn {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  color: var(--text); cursor: pointer; font-size: 1rem;
+}
+.team-score-btn.awarded { background: rgba(34,197,94,.18); border-color: var(--ok); }
+
+/* ============== SCOREBOARD STICKY ============== */
+.teams-scoreboard {
+  position: sticky; bottom: 0;
+  background: rgba(15,15,26,.85);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--card-border);
+  padding: 10px 14px; margin: 20px -20px 0;
+  display: flex; gap: 10px; overflow-x: auto;
+}
+.team-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  white-space: nowrap; font-size: .9rem;
+}
+.team-pill.leader {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124,92,255,.25);
+}
+
+/* ============== FAB + SETTINGS ============== */
+.fab {
+  position: fixed; bottom: 20px; right: 20px;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  color: var(--text); font-size: 1.4rem;
+  cursor: pointer; backdrop-filter: blur(10px);
+  z-index: 100;
+}
+.settings-panel {
+  position: fixed; bottom: 80px; right: 20px; width: 260px;
+  background: var(--bg-2);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 16px;
+  display: grid; gap: 12px;
+  z-index: 100;
+}
+.switch { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.switch select {
+  margin-left: auto;
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--card-border);
+  padding: 4px; border-radius: 6px;
+}
+
+.full { width: 100%; margin-top: 10px; }
+.back { margin-bottom: 12px; }
+.footer-stats {
+  text-align: center; color: var(--muted);
+  font-size: .85rem; margin-top: 30px;
+}
