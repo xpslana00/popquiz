@@ -28,35 +28,124 @@
 <body>
   <div id="app">
 
-    <!-- HOME -->
-    <section id="screen-home" class="screen active">
-      <div class="hero">
-        <h1>🎬 PopQuiz</h1>
-        <p class="subtitle">Filmy · hudba · seriály · hry · anime · knihy</p>
-      </div>
+   <!-- HOME -->
+<section id="screen-home" class="screen active">
+  <div class="hero">
+    <h1>🎬 PopQuiz</h1>
+    <p class="subtitle">Filmy · hudba · seriály · hry · anime · knihy</p>
+  </div>
 
-      <div class="mode-cards">
-        <button class="mode-card" data-mode="solo">
-          <span class="emoji">🧠</span>
-          <h2>Sólo režim</h2>
-          <p>Hraj sám, časovač, série bonusů</p>
-        </button>
+  <div class="mode-cards">
+    <button class="mode-card" data-mode="solo">
+      <span class="emoji">🧠</span>
+      <h2>Sólo režim</h2>
+      <p>Hraj sám, časovač, série bonusů</p>
+    </button>
 
-        <button class="mode-card" data-mode="moderator">
-          <span class="emoji">🎤</span>
-          <h2>Moderátor</h2>
-          <p>Čteš otázky ostatním, nápovědy na vyžádání</p>
-        </button>
+    <button class="mode-card" data-mode="moderator">
+      <span class="emoji">🎤</span>
+      <h2>Moderátor</h2>
+      <p>Čteš otázky ostatním, nápovědy na vyžádání</p>
+    </button>
 
-        <button class="mode-card" data-mode="teams">
-          <span class="emoji">👥</span>
-          <h2>Týmový mód</h2>
-          <p>Týmy proti sobě, moderátor řídí hru</p>
-        </button>
-      </div>
+    <button class="mode-card" data-mode="teams">
+      <span class="emoji">👥</span>
+      <h2>Týmový mód</h2>
+      <p>Týmy proti sobě, moderátor řídí hru</p>
+    </button>
 
-      <div class="footer-stats" id="footer-stats"></div>
-    </section>
+    <button class="mode-card" data-mode="custom">
+      <span class="emoji">🎨</span>
+      <h2>Vlastní hra</h2>
+      <p>Vyber kategorie, obtížnost, počet otázek a časovač</p>
+    </button>
+  </div>
+
+  <div class="home-actions">
+    <button id="btn-leaderboard" class="ghost-btn full">🏆 Žebříček</button>
+    <button id="btn-change-player" class="ghost-btn full">👤 Změnit jméno hráče</button>
+  </div>
+
+  <div class="footer-stats" id="footer-stats"></div>
+</section>
+
+<!-- CUSTOM MODE SETUP -->
+<section id="screen-custom-setup" class="screen">
+  <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
+
+  <h2>🎨 Vlastní hra</h2>
+  <p class="subtitle">Nastav si kvíz přesně podle sebe</p>
+
+  <div class="custom-section">
+    <h3>📚 Kategorie</h3>
+    <div class="chip-group" id="custom-categories">
+      <button class="chip" data-cat="Film">🎬 Film</button>
+      <button class="chip" data-cat="Hudba">🎵 Hudba</button>
+      <button class="chip" data-cat="Serialy">📺 Seriály</button>
+      <button class="chip" data-cat="Hry">🎮 Hry</button>
+      <button class="chip" data-cat="Anime">🌸 Anime</button>
+      <button class="chip" data-cat="Knihy">📚 Knihy</button>
+    </div>
+    <p class="hint-text-small">Když nevybereš nic, použijí se všechny kategorie.</p>
+  </div>
+
+  <div class="custom-section">
+    <h3>⚡ Obtížnost</h3>
+    <div class="chip-group" id="custom-difficulties">
+      <button class="chip" data-diff="easy">● Lehká</button>
+      <button class="chip" data-diff="medium">●● Střední</button>
+      <button class="chip" data-diff="hard">●●● Těžká</button>
+    </div>
+    <p class="hint-text-small">Když nevybereš nic, použijí se všechny obtížnosti.</p>
+  </div>
+
+  <div class="custom-section">
+    <h3>🔢 Počet otázek</h3>
+    <div class="chip-group" id="custom-count">
+      <button class="chip" data-count="10">10</button>
+      <button class="chip" data-count="20">20</button>
+      <button class="chip selected" data-count="30">30</button>
+      <button class="chip" data-count="50">50</button>
+      <button class="chip" data-count="100">100</button>
+    </div>
+  </div>
+
+  <div class="custom-section">
+    <h3>⏱️ Časovač</h3>
+    <div class="chip-group" id="custom-timer">
+      <button class="chip" data-timer="0">Bez časovače</button>
+      <button class="chip" data-timer="10">10 s</button>
+      <button class="chip selected" data-timer="15">15 s</button>
+      <button class="chip" data-timer="30">30 s</button>
+      <button class="chip" data-timer="60">60 s</button>
+    </div>
+  </div>
+
+  <div class="custom-section">
+    <h3>🎯 Režim hry</h3>
+    <div class="chip-group" id="custom-gametype">
+      <button class="chip selected" data-gametype="solo">🧠 Sólo</button>
+      <button class="chip" data-gametype="moderator">🎤 Moderátor</button>
+      <button class="chip" data-gametype="teams">👥 Týmy</button>
+    </div>
+  </div>
+
+  <div id="custom-summary" class="custom-summary"></div>
+
+  <button id="btn-start-custom" class="primary-btn full">🚀 Spustit vlastní hru</button>
+</section>
+
+<!-- LEADERBOARD -->
+<section id="screen-leaderboard" class="screen">
+  <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
+
+  <h2>🏆 Žebříček</h2>
+  <p class="subtitle">Lokální historie skóre na tomto zařízení</p>
+
+  <div id="leaderboard-list" class="leaderboard-list"></div>
+
+  <button id="btn-clear-leaderboard" class="ghost-btn full">🧹 Vymazat lokální historii</button>
+</section>
 
     <!-- NASTAVENÍ TÝMŮ -->
     <section id="screen-teams-setup" class="screen">

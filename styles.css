@@ -296,3 +296,116 @@ html, body {
   text-align: center; color: var(--muted);
   font-size: .85rem; margin-top: 30px;
 }
+/* ============== CUSTOM MODE ============== */
+.home-actions {
+  margin-top: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.custom-section {
+  margin: 24px 0;
+}
+
+.custom-section h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+}
+
+.chip.selected {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: white;
+  font-weight: 600;
+}
+
+.hint-text-small {
+  color: var(--muted);
+  font-size: .8rem;
+  margin-top: 6px;
+}
+
+.custom-summary {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px;
+  margin: 24px 0 12px;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.custom-summary b {
+  color: var(--text);
+}
+
+/* ============== LEADERBOARD ============== */
+.leaderboard-list {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.leaderboard-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.leaderboard-rank {
+  font-weight: 800;
+  color: var(--accent-2);
+}
+
+.leaderboard-name {
+  font-weight: 700;
+}
+
+.leaderboard-meta {
+  color: var(--muted);
+  font-size: .8rem;
+  margin-top: 3px;
+}
+
+.leaderboard-score {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.empty-state {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 18px;
+  color: var(--muted);
+  text-align: center;
+}
