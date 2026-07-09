@@ -3,32 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
   <title>PopQuiz – kvíz o popkultuře</title>
 
-  <!-- PWA manifest -->
-  ./manifest.webmanifest
+  .webmanifest" />
   <meta name="theme-color" content="#0f0f1a" />
 
-  <!-- Mobile web app -->
   <meta name="mobile-web-app-capable" content="yes" />
-
-  <!-- iOS specifika -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="PopQuiz" />
 
-  <!-- Favicon + iOS home screen icon -->
   ./icons/apple-touch-icon.png
-  <linkns/apple-touch-icon.png
+  <link rel="apple-touchon.png
 
-  <!-- CSS -->
   ./styles.css
 </head>
 <body>
   <div id="app">
 
-    <!-- HOME -->
     <section id="screen-home" class="screen active">
       <div class="hero">
         <h1>🎬 PopQuiz</h1>
@@ -75,72 +67,25 @@
       <div class="footer-stats" id="footer-stats"></div>
     </section>
 
-    <!-- RANKED INFO -->
     <section id="screen-ranked-info" class="screen">
       <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
-
       <div class="ranked-info">
         <h2>🏆 Ranked hra</h2>
         <p class="subtitle">Férová hodnocená hra pro žebříček</p>
-
         <div class="ranked-rules">
-          <div class="rule-item">
-            <span class="rule-icon">📊</span>
-            <div>
-              <b>20 otázek</b>
-              <p>Random mix ze všech kategorií a obtížností</p>
-            </div>
-          </div>
-
-          <div class="rule-item">
-            <span class="rule-icon">⏱️</span>
-            <div>
-              <b>15 sekund / otázka</b>
-              <p>Bez pauzy, bez nápověd</p>
-            </div>
-          </div>
-
-          <div class="rule-item">
-            <span class="rule-icon">💯</span>
-            <div>
-              <b>Bonusy za obtížnost</b>
-              <p>Lehká ×1 · Střední ×1.5 · Těžká ×2</p>
-            </div>
-          </div>
-
-          <div class="rule-item">
-            <span class="rule-icon">🔥</span>
-            <div>
-              <b>Streak bonus</b>
-              <p>+50 bodů za 3+ správně v řadě</p>
-            </div>
-          </div>
-
-          <div class="rule-item">
-            <span class="rule-icon">⚡</span>
-            <div>
-              <b>Time bonus</b>
-              <p>+5 bodů za každou zbývající sekundu</p>
-            </div>
-          </div>
-
-          <div class="rule-item">
-            <span class="rule-icon">⚠️</span>
-            <div>
-              <b>Skóre se uloží vždy</b>
-              <p>Žebříček je férový – i špatné hry se počítají</p>
-            </div>
-          </div>
+          <div class="rule-item"><span class="rule-icon">📊</span><div><b>20 otázek</b><p>Random mix ze všech kategorií a obtížností</p></div></div>
+          <div class="rule-item"><span class="rule-icon">⏱️</span><div><b>15 sekund / otázka</b><p>Bez pauzy, bez nápověd</p></div></div>
+          <div class="rule-item"><span class="rule-icon">💯</span><div><b>Bonusy za obtížnost</b><p>Lehká ×1 · Střední ×1.5 · Těžká ×2</p></div></div>
+          <div class="rule-item"><span class="rule-icon">🔥</span><div><b>Streak bonus</b><p>+50 bodů za 3+ správně v řadě</p></div></div>
+          <div class="rule-item"><span class="rule-icon">⚡</span><div><b>Time bonus</b><p>+5 bodů za každou zbývající sekundu</p></div></div>
+          <div class="rule-item"><span class="rule-icon">⚠️</span><div><b>Skóre se uloží vždy</b><p>Žebříček je férový – i špatné hry se počítají</p></div></div>
         </div>
-
         <button id="btn-start-ranked" class="primary-btn full">🚀 Zahájit Ranked hru</button>
       </div>
     </section>
 
-    <!-- CUSTOM MODE SETUP -->
     <section id="screen-custom-setup" class="screen">
       <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
-
       <h2>🎨 Vlastní hra</h2>
       <p class="subtitle">Nastav si kvíz přesně podle sebe</p>
 
@@ -199,50 +144,34 @@
       </div>
 
       <div id="custom-summary" class="custom-summary"></div>
-
       <button id="btn-start-custom" class="primary-btn full">🚀 Spustit vlastní hru</button>
     </section>
 
-    <!-- LEADERBOARD -->
     <section id="screen-leaderboard" class="screen">
       <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
-
       <h2>🏆 Žebříček</h2>
       <p class="subtitle">Lokální historie skóre na tomto zařízení</p>
-
       <div id="leaderboard-list" class="leaderboard-list"></div>
-
       <button id="btn-clear-leaderboard" class="ghost-btn full">🧹 Vymazat lokální historii</button>
     </section>
 
-    <!-- NASTAVENÍ TÝMŮ -->
     <section id="screen-teams-setup" class="screen">
       <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
       <h2>Nastavení týmů</h2>
       <p class="subtitle">Přidej 2–6 týmů a pojmenuj je</p>
-
       <div id="teams-editor" class="teams-editor"></div>
-
       <button id="btn-add-team" class="ghost-btn">+ Přidat tým</button>
       <button id="btn-start-teams" class="primary-btn full">Spustit hru</button>
     </section>
 
-    <!-- HRA -->
     <section id="screen-game" class="screen">
       <header class="game-header">
         <button class="ghost-btn back" data-go="screen-home">←</button>
-
         <div class="progress">
           <span id="progress-text">1 / 30</span>
-          <div class="progress-bar">
-            <div id="progress-fill"></div>
-          </div>
+          <div class="progress-bar"><div id="progress-fill"></div></div>
         </div>
-
-        <div id="timer-badge" class="timer-badge hidden">
-          ⏱ <span id="timer-text">15</span>s
-        </div>
-
+        <div id="timer-badge" class="timer-badge hidden">⏱ <span id="timer-text">15</span>s</div>
         <div id="score-badge" class="score-badge">0</div>
       </header>
 
@@ -251,31 +180,24 @@
           <span class="category-chip" id="category-chip">Film</span>
           <span class="difficulty-chip" id="difficulty-chip">●●●</span>
         </div>
-
         <h2 id="question-text">Otázka…</h2>
-
-        <!-- SÓLO -->
         <div id="answers" class="answers hidden"></div>
         <div id="solo-feedback" class="solo-feedback hidden"></div>
 
-        <!-- MODERÁTOR / TÝMY -->
         <div id="moderator-panel" class="moderator-panel hidden">
           <div class="correct-answer">
             <span class="label">Správná odpověď:</span>
             <span id="correct-answer-text" class="blurred">●●●●●●●</span>
             <button id="btn-reveal" class="ghost-btn">Odhalit</button>
           </div>
-
           <div class="hints">
             <h3>💡 Nápovědy</h3>
             <div id="hints-list"></div>
           </div>
-
           <div id="teams-scoring" class="teams-scoring hidden">
             <h3>Kdo uhodl?</h3>
             <div id="teams-buttons"></div>
           </div>
-
           <div class="mod-controls">
             <button id="btn-skip" class="ghost-btn">Přeskočit</button>
             <button id="btn-next-mod" class="primary-btn">Další otázka →</button>
@@ -286,33 +208,21 @@
       <aside id="teams-scoreboard" class="teams-scoreboard hidden"></aside>
     </section>
 
-    <!-- VÝSLEDEK -->
     <section id="screen-result" class="screen">
       <div class="result-card">
         <h1 id="result-title">Hotovo! 🎉</h1>
         <div id="result-body"></div>
-
         <button id="btn-restart" class="primary-btn full">Hrát znovu</button>
         <button class="ghost-btn full" data-go="screen-home">Hlavní menu</button>
       </div>
     </section>
 
-    <!-- NASTAVENÍ (plovoucí tlačítko) -->
     <button id="settings-toggle" class="fab">⚙️</button>
 
     <div id="settings-panel" class="settings-panel hidden">
       <h3>Nastavení</h3>
-
-      <label class="switch">
-        <input type="checkbox" id="opt-sound" checked />
-        🔊 Zvuky
-      </label>
-
-      <label class="switch">
-        <input type="checkbox" id="opt-timer" checked />
-        ⏱ Časovač v sólo (15 s)
-      </label>
-
+      <label class="switch"><input type="checkbox" id="opt-sound" checked /> 🔊 Zvuky</label>
+      <label class="switch"><input type="checkbox" id="opt-timer" checked /> ⏱ Časovač v sólo (15 s)</label>
       <label class="switch">
         Otázek na hru:
         <select id="opt-count">
@@ -321,12 +231,10 @@
           <option>50</option>
         </select>
       </label>
-
       <button id="btn-reset-pool" class="ghost-btn">🔄 Reset paměti otázek</button>
     </div>
   </div>
 
-  <!-- JS -->
   ./app.js
 </body>
 </html>
