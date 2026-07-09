@@ -1,6 +1,6 @@
 /* ===================================================================
    POPQUIZ – HERNÍ LOGIKA
-   Custom mode + player name + local leaderboard + answer shuffle
+   Custom mode + player name + local leaderboard + Ranked mode
    =================================================================== */
 
 /* ============== ULOŽIŠTĚ ============== */
@@ -19,9 +19,16 @@ const defaultSettings = {
   timerSec: 15
 };
 
+/* ============== RANKED MODE CONFIG ============== */
+const RANKED_CONFIG = {
+  count: 20,
+  timerSec: 15,
+  difficultyMultiplier: { easy: 1, medium: 1.5, hard: 2 }
+};
+
 /* ============== STAV APLIKACE ============== */
 const state = {
-  mode: null, // solo | moderator | teams
+  mode: null, // solo | moderator | teams | ranked
   questions: [],
   index: 0,
   score: 0,
@@ -166,6 +173,17 @@ function formatDateTime(iso) {
   }
 }
 
+function getModeLabel(mode) {
+  const labels = {
+    "solo": "Sólo",
+    "ranked": "🏆 Ranked",
+    "moderator": "Moderátor",
+    "teams": "Týmy",
+    "custom": "Vlastní"
+  };
+  return labels[mode] || mode;
+}
+
 function renderLeaderboard() {
   const list = $("#leaderboard-list");
   if (!list) return;
@@ -177,7 +195,7 @@ function renderLeaderboard() {
   if (history.length === 0) {
     list.innerHTML = `
       <div class="empty-state">
-        Zatím tu není žádné skóre. Odehraj sólo hru a něco se tu objeví.
+        Zatím tu není žádné skóre. Odehraj sólo nebo ranked hru a něco se tu objeví.
       </div>
     `;
   } else {
@@ -186,7 +204,7 @@ function renderLeaderboard() {
         <div class="leaderboard-rank">#${i + 1}</div>
         <div>
           <div class="leaderboard-name">${escapeHtml(r.name)}</div>
-          <div class="leaderboard-meta">${formatDateTime(r.date)} · ${r.total || "?"} otázek</div>
+          <div class="leaderboard-meta">${formatDateTime(r.date)} · ${r.total || "?"} otázek · ${getModeLabel(r.mode)}</div>
         </div>
         <div class="leaderboard-score">${r.score}</div>
       </div>
@@ -235,7 +253,13 @@ const audio = (() => {
       beep(440, 0.2, "square");
       setTimeout(() => beep(330, 0.3, "square"), 150);
     },
-    click: () => beep(700, 0.04, "square", 0.06)
+    click: () => beep(700, 0.04, "square", 0.06),
+    fanfare: () => {
+      beep(523, 0.15, "sine", 0.15);
+      setTimeout(() => beep(659, 0.15, "sine", 0.15), 100);
+      setTimeout(() => beep(784, 0.15, "sine", 0.15), 200);
+      setTimeout(() => beep(1047, 0.3, "sine", 0.2), 300);
+    }
   };
 })();
 
@@ -317,6 +341,11 @@ async function startGame(mode) {
     return;
   }
 
+  if (mode === "ranked") {
+    showScreen("screen-ranked-info");
+    return;
+  }
+
   state.mode = mode;
   state.index = 0;
   state.score = 0;
@@ -369,6 +398,34 @@ async function startTeamsGame() {
 
   if (state.questions.length === 0) {
     alert("Žádné otázky neodpovídají filtru. Zkus upravit nastavení.");
+    return;
+  }
+
+  showScreen("screen-game");
+  renderQuestion();
+}
+
+/* ============== RANKED MODE ============== */
+async function startRankedGame() {
+  audio.click();
+  ensurePlayerName();
+
+  state.mode = "ranked";
+  state.index = 0;
+  state.score = 0;
+  state.streak = 0;
+  state.total = RANKED_CONFIG.count;
+  state.settings.timerSec = RANKED_CONFIG.timerSec;
+  state.settings.timer = true;
+
+  const all = await loadAllQuestions();
+
+  // Ranked = úplně random mix ze všech otázek, žádný filtr, žádné seen tracking
+  state.questions = shuffle(all).slice(0, RANKED_CONFIG.count);
+  state.total = state.questions.length;
+
+  if (state.questions.length < RANKED_CONFIG.count) {
+    alert("Nedostatek otázek pro Ranked hru.");
     return;
   }
 
@@ -443,7 +500,9 @@ function renderQuestion() {
   $("#question-text").textContent = q.question;
   $("#progress-text").textContent = `${state.index + 1} / ${state.total}`;
   $("#progress-fill").style.width = `${(state.index / state.total) * 100}%`;
-  $("#score-badge").textContent = state.mode === "solo" ? state.score : "—";
+
+  const showScore = state.mode === "solo" || state.mode === "ranked";
+  $("#score-badge").textContent = showScore ? state.score : "—";
 
   $("#answers").classList.add("hidden");
   $("#solo-feedback").classList.add("hidden");
@@ -452,14 +511,14 @@ function renderQuestion() {
   $("#teams-scoreboard").classList.add("hidden");
   $("#timer-badge").classList.add("hidden");
 
-  if (state.mode === "solo") {
+  if (state.mode === "solo" || state.mode === "ranked") {
     renderSolo(q);
   } else {
     renderModerator(q);
   }
 }
 
-/* ============== SÓLO ============== */
+/* ============== SÓLO / RANKED ============== */
 function renderSolo(q) {
   $("#answers").classList.remove("hidden");
 
@@ -530,7 +589,17 @@ function handleSoloAnswer(btn, picked, q) {
 
     const timeBonus = state.settings.timer ? Math.max(0, state.timeLeft * 5) : 0;
     const streakBonus = state.streak >= 3 ? 50 : 0;
-    const gain = 100 + timeBonus + streakBonus;
+    let gain = 100 + timeBonus + streakBonus;
+
+    // Ranked mode – násobič obtížnosti
+    let difficultyBadge = "";
+    if (state.mode === "ranked") {
+      const multiplier = RANKED_CONFIG.difficultyMultiplier[q.difficulty] || 1;
+      gain = Math.round(gain * multiplier);
+      if (multiplier > 1) {
+        difficultyBadge = ` <span style="color:#ffd700">×${multiplier}</span>`;
+      }
+    }
 
     state.score += gain;
     audio.correct();
@@ -538,7 +607,7 @@ function handleSoloAnswer(btn, picked, q) {
     fb.classList.add("ok");
     fb.innerHTML = `
       <h3>Správně! 🎉</h3>
-      <p>+${gain} bodů${streakBonus ? ` (série ×${state.streak} 🔥)` : ""}</p>
+      <p>+${gain} bodů${difficultyBadge}${streakBonus ? ` (série ×${state.streak} 🔥)` : ""}</p>
     `;
   } else {
     state.streak = 0;
@@ -550,7 +619,8 @@ function handleSoloAnswer(btn, picked, q) {
       : `<h3>Špatně 😬</h3><p>Správně bylo: <b>${q.answers[correct]}</b></p>`;
   }
 
-  setTimeout(nextQuestion, 1800);
+  const nextDelay = state.mode === "ranked" ? 1500 : 1800;
+  setTimeout(nextQuestion, nextDelay);
 }
 
 /* ============== MODERÁTOR + TÝMY ============== */
@@ -816,6 +886,28 @@ function finishGame() {
         `).join("")}
       </div>
     `;
+  } else if (state.mode === "ranked") {
+    // Speciální výsledek pro Ranked mode
+    audio.fanfare();
+    const player = getPlayerName() || "Hráč";
+    const rank = getRankedRank(state.score);
+
+    $("#result-title").textContent = "🏆 Ranked hotovo!";
+    $("#result-body").innerHTML = `
+      <p class="big-score">${state.score} bodů</p>
+      <p class="subtitle">${player}</p>
+      <div class="ranked-result-card">
+        ${rank ? `<p><b>Tvůj rank:</b> #${rank.position} z ${rank.total} her</p>` : ""}
+        <p class="subtitle">${
+          state.score >= 3000 ? "🌟 Legendární výkon!" :
+          state.score >= 2000 ? "🔥 Skvělá hra!" :
+          state.score >= 1000 ? "👏 Slušný výkon" :
+          "💪 Příště lépe!"
+        }</p>
+      </div>
+    `;
+
+    updateStats(state.score);
   } else if (state.mode === "solo") {
     $("#result-title").textContent = "Hotovo! 🎉";
     $("#result-body").innerHTML = `
@@ -835,6 +927,19 @@ function finishGame() {
   }
 
   showScreen("screen-result");
+}
+
+function getRankedRank(currentScore) {
+  const history = loadScoreHistory().filter(h => h.mode === "ranked");
+  if (history.length === 0) return null;
+
+  const sorted = history.sort((a, b) => b.score - a.score);
+  const position = sorted.findIndex(h => h.score <= currentScore) + 1;
+
+  return {
+    position: position || sorted.length + 1,
+    total: sorted.length + 1
+  };
 }
 
 function updateStats(score) {
@@ -932,6 +1037,9 @@ $("#btn-clear-leaderboard").onclick = () => {
 
 $("#btn-start-custom").onclick = startCustomGame;
 
+// Ranked mode start
+$("#btn-start-ranked")?.addEventListener("click", startRankedGame);
+
 renderHomeStats();
 
 /* ============== REGISTRACE SERVICE WORKERU ============== */
@@ -942,3 +1050,4 @@ if ("serviceWorker" in navigator) {
       .catch((err) => console.warn("SW chyba:", err));
   });
 }
+``
