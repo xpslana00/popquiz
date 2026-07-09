@@ -24,7 +24,19 @@ html, body {
     var(--bg);
   color: var(--text);
   min-height: 100dvh;
+  height: 100%;
+  overflow-x: hidden;
+  overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Fullscreen tweaky */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
 }
 
 #app {
@@ -62,12 +74,75 @@ html, body {
   cursor: pointer;
   backdrop-filter: blur(20px);
   transition: transform .15s, border-color .15s;
+  position: relative;
 }
 .mode-card:active { transform: scale(.98); }
 .mode-card:hover { border-color: var(--accent); }
 .mode-card .emoji { font-size: 2rem; }
 .mode-card h2 { margin: 8px 0 4px; }
 .mode-card p { margin: 0; color: var(--muted); }
+
+/* ============== RANKED FEATURED KARTA ============== */
+.mode-card-featured {
+  background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.1));
+  border-color: rgba(255,215,0,0.4);
+  position: relative;
+}
+.mode-card-featured::before {
+  content: "⭐ HODNOCENÁ HRA";
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: #1a1a2e;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 12px rgba(255, 215, 0, 0.4);
+}
+.mode-card-featured:hover {
+  border-color: #ffd700;
+  transform: scale(1.02);
+}
+
+/* ============== RANKED INFO OBRAZOVKA ============== */
+.ranked-info { padding: 20px 0; }
+
+.ranked-rules {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.rule-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.rule-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.rule-item b {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.rule-item p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.4;
+}
 
 /* ============== GAME HEADER ============== */
 .game-header {
@@ -296,6 +371,7 @@ html, body {
   text-align: center; color: var(--muted);
   font-size: .85rem; margin-top: 30px;
 }
+
 /* ============== CUSTOM MODE ============== */
 .home-actions {
   margin-top: 20px;
