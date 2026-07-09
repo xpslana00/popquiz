@@ -7,6 +7,7 @@ const ASSETS = [
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./auth.js",
   "./manifest.webmanifest",
   "./data/questions.json",
   "./icons/icon-192.png",
