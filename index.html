@@ -23,83 +23,69 @@
   <div id="app">
 
     <section id="screen-welcome" class="screen">
-  <div class="w-container">
+  <div class="w-wrap">
 
     <div class="w-hero">
       <div class="w-badge">
-        <span class="w-badge-dot"></span>
-        Live · 810 otázek
+        <span class="w-dot"></span>
+        810 otázek · 6 kategorií
       </div>
-      <h1 class="w-title">Testuj svoje<br><span class="w-gradient">popkultury.</span></h1>
-      <p class="w-tagline">Rychlý kvíz o filmech, seriálech, hudbě, hrách, anime a knihách. Přihlas se a soutěž s ostatními.</p>
+      <h1 class="w-title">
+        Testuj svoje<br>
+        <span class="w-grad">popkulturní</span> znalosti
+      </h1>
+      <p class="w-tag">Rychlý kvíz o filmech, seriálech, hudbě, hrách, anime a knihách.</p>
     </div>
 
     <div class="w-preview">
-      <div class="w-phone">
-        <div class="w-phone-notch"></div>
-        <div class="w-phone-screen">
-          <div class="w-mock-header">
-            <div class="w-mock-progress">
-              <div class="w-mock-progress-bar"></div>
+      <div class="iphone">
+        <div class="iphone-island"></div>
+        <div class="iphone-screen">
+          <div class="ip-top">
+            <div class="ip-time">9:41</div>
+            <div class="ip-status">
+              <span>􀋙</span>
+              <span>􀎡</span>
+              <span>􀛨</span>
             </div>
-            <div class="w-mock-timer">⏱ 12s</div>
-            <div class="w-mock-score">2140</div>
           </div>
-          <div class="w-mock-chip">🎬 Film · ●● Střední</div>
-          <div class="w-mock-question">Kdo hraje Iron Mana ve filmech Marvel?</div>
-          <div class="w-mock-answers">
-            <div class="w-mock-answer">Chris Evans</div>
-            <div class="w-mock-answer w-mock-correct">Robert Downey Jr. ✓</div>
-            <div class="w-mock-answer">Chris Hemsworth</div>
-            <div class="w-mock-answer">Mark Ruffalo</div>
+          <div class="ip-header">
+            <div class="ip-progress">
+              <div class="ip-progress-bar"></div>
+            </div>
+            <div class="ip-timer">⏱ 12s</div>
+            <div class="ip-score">2140</div>
           </div>
-        </div>
-      </div>
-
-      <div class="w-float-card w-float-1">
-        <span class="w-float-emoji">🏆</span>
-        <div>
-          <div class="w-float-label">Rank</div>
-          <div class="w-float-value">#3</div>
-        </div>
-      </div>
-
-      <div class="w-float-card w-float-2">
-        <span class="w-float-emoji">🔥</span>
-        <div>
-          <div class="w-float-label">Streak</div>
-          <div class="w-float-value">×5</div>
+          <div class="ip-chip">🎬 Film · ●● Střední</div>
+          <div class="ip-question">Kdo hraje Iron Mana v MCU?</div>
+          <div class="ip-answers">
+            <div class="ip-answer">Chris Evans</div>
+            <div class="ip-answer ip-correct">Robert Downey Jr. ✓</div>
+            <div class="ip-answer">Chris Hemsworth</div>
+            <div class="ip-answer">Mark Ruffalo</div>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="w-features">
-      <div class="w-feature">
-        <div class="w-feature-icon">🏆</div>
-        <div class="w-feature-text">
-          <div class="w-feature-title">Ranked hry</div>
-          <div class="w-feature-desc">Férové skóre s obtížností bonusy</div>
-        </div>
+      <div class="w-feat">
+        <span class="w-feat-ico">🏆</span>
+        <span class="w-feat-txt">Ranked hry</span>
       </div>
-      <div class="w-feature">
-        <div class="w-feature-icon">☁️</div>
-        <div class="w-feature-text">
-          <div class="w-feature-title">Cloud sync</div>
-          <div class="w-feature-desc">Skóre napříč zařízeními</div>
-        </div>
+      <div class="w-feat">
+        <span class="w-feat-ico">☁️</span>
+        <span class="w-feat-txt">Cloud sync</span>
       </div>
-      <div class="w-feature">
-        <div class="w-feature-icon">🌍</div>
-        <div class="w-feature-text">
-          <div class="w-feature-title">Global leaderboard</div>
-          <div class="w-feature-desc">Soutěž s hráči po celém světě</div>
-        </div>
+      <div class="w-feat">
+        <span class="w-feat-ico">🌍</span>
+        <span class="w-feat-txt">Žebříček</span>
       </div>
     </div>
 
-    <div class="w-cta">
-      <button id="btn-welcome-google" class="w-btn-primary">
-        <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <div class="w-actions">
+      <button id="btn-welcome-google" class="w-google">
+        <svg width="18" height="18" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -107,19 +93,7 @@
         </svg>
         Přihlásit se přes Google
       </button>
-      <button id="btn-welcome-skip" class="w-btn-secondary">
-        Jen se rozkoukat →
-      </button>
-    </div>
-
-    <div class="w-footer">
-      <div class="w-stats">
-        <div class="w-stat"><b>810</b> otázek</div>
-        <div class="w-stat-sep">·</div>
-        <div class="w-stat"><b>6</b> kategorií</div>
-        <div class="w-stat-sep">·</div>
-        <div class="w-stat"><b>Free</b> forever</div>
-      </div>
+      <button id="btn-welcome-skip" class="w-skip">Hrát bez přihlášení →</button>
     </div>
 
   </div>
