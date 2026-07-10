@@ -1079,4 +1079,59 @@ html, body {
     width: 200px;
     height: 400px;
   }
+  /* ============== iOS PWA SAFE AREA FIX ============== */
+
+/* Safe area padding pro všechny screens (iOS PWA notch/statusbar) */
+#screen-welcome {
+  padding-top: env(safe-area-inset-top) !important;
+  padding-bottom: env(safe-area-inset-bottom) !important;
+}
+
+.w-wrap {
+  padding-top: max(20px, env(safe-area-inset-top)) !important;
+  padding-bottom: max(30px, env(safe-area-inset-bottom)) !important;
+}
+
+/* Home screen taky */
+#screen-home,
+#screen-ranked-info,
+#screen-custom-setup,
+#screen-leaderboard,
+#screen-teams-setup,
+#screen-game,
+#screen-result {
+  padding-top: max(28px, env(safe-area-inset-top)) !important;
+}
+
+/* Fullscreen PWA na iOS */
+@supports (padding-top: env(safe-area-inset-top)) {
+  #app {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Extra padding pouze v PWA mode (standalone) */
+@media all and (display-mode: standalone) {
+  #screen-welcome .w-wrap {
+    padding-top: max(40px, env(safe-area-inset-top)) !important;
+  }
+
+  #screen-home,
+  #screen-ranked-info,
+  #screen-custom-setup,
+  #screen-leaderboard,
+  #screen-teams-setup,
+  #screen-game,
+  #screen-result {
+    padding-top: max(48px, env(safe-area-inset-top)) !important;
+  }
+}
+
+/* iOS specifický fullscreen */
+@media all and (display-mode: fullscreen) {
+  #screen-welcome .w-wrap {
+    padding-top: max(50px, env(safe-area-inset-top)) !important;
+  }
+}
 }
