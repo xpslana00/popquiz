@@ -407,6 +407,14 @@ async function startTeamsGame() {
 
 /* ============== RANKED MODE ============== */
 async function startRankedGame() {
+   if (typeof isSignedIn === 'function' && !isSignedIn()) {
+    alert('Pro Ranked hru se musis prihlasit pres Google. Klikni na tlacitko "Prihlasit se pres Google" nahore.');
+    const banner = document.querySelector('#auth-banner');
+    if (banner) {
+      banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
   audio.click();
   ensurePlayerName();
 
@@ -908,6 +916,19 @@ function finishGame() {
     `;
 
     updateStats(state.score);
+     
+    if (typeof saveScoreToCloud === 'function' && typeof isSignedIn === 'function' && isSignedIn()) {
+      saveScoreToCloud({
+        score: state.score,
+        mode: 'ranked',
+        total_questions: state.total,
+        correct_answers: state.correctCount || 0
+      }).then(saved => {
+        if (saved) {
+          console.log('Ranked score saved to cloud');
+        }
+      });
+    }
   } else if (state.mode === "solo") {
     $("#result-title").textContent = "Hotovo! 🎉";
     $("#result-body").innerHTML = `
@@ -955,11 +976,25 @@ function updateStats(score) {
 function renderHomeStats() {
   const s = JSON.parse(localStorage.getItem(STORAGE.stats) || "{}");
   const seenCount = loadSeen().size;
-  const player = getPlayerName() || "bez jména";
+  let player = "bez jména";
+  if (typeof isSignedIn === 'function' && isSignedIn() && typeof getDisplayName === 'function') {
+    player = getDisplayName();
+  } else {
+    player = getPlayerName() || "bez jména";
+  }
 
   $("#footer-stats").innerHTML = s.gamesPlayed
     ? `Hráč: <b>${escapeHtml(player)}</b> · Odehráno: <b>${s.gamesPlayed}</b> · Nejlepší skóre: <b>${s.bestScore}</b> · Viděno otázek: <b>${seenCount}</b>`
     : `Hráč: <b>${escapeHtml(player)}</b> · Zatím jsi nehrál. Pusť se do toho! 🚀`;
+   
+  const changePlayerBtn = document.querySelector('#btn-change-player');
+  if (changePlayerBtn) {
+    if (typeof isSignedIn === 'function' && isSignedIn()) {
+      changePlayerBtn.style.display = 'none';
+    } else {
+      changePlayerBtn.style.display = '';
+    }
+  }
 }
 
 /* ============== NAVIGACE A NASTAVENÍ ============== */
@@ -1048,6 +1083,18 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js")
       .then(() => console.log("Service Worker zaregistrován ✅"))
       .catch((err) => console.warn("SW chyba:", err));
+  });
+}
+
+
+/* ============== SYNC STATS BAR WITH AUTH ============== */
+if (typeof sb !== 'undefined' && sb.auth) {
+  sb.auth.onAuthStateChange(() => {
+    setTimeout(() => {
+      if (typeof renderHomeStats === 'function') {
+        renderHomeStats();
+      }
+    }, 200);
   });
 }
 ``
