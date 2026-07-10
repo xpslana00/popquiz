@@ -9,7 +9,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function signInWithGoogle() {
-  console.log('🔐 Startuji Google login...');
+  console.log('Startuji Google login...');
   const { data, error } = await sb.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -17,18 +17,18 @@ async function signInWithGoogle() {
     }
   });
   if (error) {
-    console.error('❌ Google login error:', error);
+    console.error('Google login error:', error);
     alert('Přihlášení selhalo: ' + error.message);
   }
 }
 
 async function signOut() {
-  console.log('👋 Odhlašuji se...');
+  console.log('Odhlašuji se...');
   const { error } = await sb.auth.signOut();
   if (error) {
-    console.error('❌ Sign out error:', error);
+    console.error('Sign out error:', error);
   } else {
-    console.log('✅ Odhlášen');
+    console.log('Odhlášen');
     location.reload();
   }
 }
@@ -45,7 +45,7 @@ async function getUserProfile(userId) {
     .eq('id', userId)
     .single();
   if (error) {
-    console.error('❌ Profile fetch error:', error);
+    console.error('Profile fetch error:', error);
     return null;
   }
   return data;
@@ -59,41 +59,45 @@ async function updateProfile(userId, updates) {
     .select()
     .single();
   if (error) {
-    console.error('❌ Profile update error:', error);
+    console.error('Profile update error:', error);
     return null;
   }
   return data;
 }
 
 sb.auth.onAuthStateChange(async (event, session) => {
-  console.log('🔔 Auth event:', event);
+  console.log('Auth event:', event);
   if (event === 'SIGNED_IN') {
-    console.log('✅ Uživatel přihlášen:', session.user.email);
+    console.log('Uzivatel prihlasen:', session.user.email);
     const profile = await getUserProfile(session.user.id);
     updateAuthUI(session.user, profile);
   } else if (event === 'SIGNED_OUT') {
-    console.log('👋 Uživatel odhlášen');
+    console.log('Uzivatel odhlasen');
     updateAuthUI(null, null);
   }
 });
 
 function updateAuthUI(user, profile) {
-  const authInfoEl = document.querySelector('#auth-info');
-  const loginBtnEl = document.querySelector('#btn-google-login');
-  const logoutBtnEl = document.querySelector('#btn-logout');
+  const userInfo = document.querySelector('#auth-user-info');
+  const loginBtn = document.querySelector('#btn-google-login');
+  const avatarEl = document.querySelector('#auth-avatar');
+  const nameEl = document.querySelector('#auth-name');
+  const emailEl = document.querySelector('#auth-email');
+
   if (user) {
-    if (authInfoEl) {
-      const displayName = profile?.username || user.email;
-      const avatar = profile?.avatar_emoji || '👤';
-      authInfoEl.innerHTML = avatar + ' <b>' + displayName + '</b>';
-      authInfoEl.style.display = 'block';
-    }
-    if (loginBtnEl) loginBtnEl.style.display = 'none';
-    if (logoutBtnEl) logoutBtnEl.style.display = 'inline-block';
+    const displayName = profile?.username || user.user_metadata?.full_name || user.email;
+    const avatar = profile?.avatar_emoji || 'U';
+    const email = user.email || '';
+
+    if (avatarEl) avatarEl.textContent = avatar;
+    if (nameEl) nameEl.textContent = displayName;
+    if (emailEl) emailEl.textContent = email;
+
+    if (userInfo) userInfo.style.display = 'flex';
+    if (loginBtn) loginBtn.style.display = 'none';
   } else {
-    if (authInfoEl) authInfoEl.style.display = 'none';
-    if (loginBtnEl) loginBtnEl.style.display = 'inline-block';
-    if (logoutBtnEl) logoutBtnEl.style.display = 'none';
+    if (userInfo) userInfo.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'flex';
   }
 }
 
@@ -103,14 +107,26 @@ function updateAuthUI(user, profile) {
     if (user) {
       const profile = await getUserProfile(user.id);
       updateAuthUI(user, profile);
-      console.log('✅ Uživatel je přihlášen:', user.email);
+      console.log('Uzivatel je prihlasen:', user.email);
     } else {
-      console.log('ℹ️ Uživatel není přihlášen');
+      console.log('Uzivatel neni prihlasen');
     }
   } catch (err) {
-    console.error('❌ Auth startup error:', err);
+    console.error('Auth startup error:', err);
   }
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+  const loginBtn = document.querySelector('#btn-google-login');
+  const logoutBtn = document.querySelector('#btn-logout');
+
+  if (loginBtn) {
+    loginBtn.addEventListener('click', signInWithGoogle);
+  }
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', signOut);
+  }
+});
 
 window.sb = sb;
 window.signInWithGoogle = signInWithGoogle;
@@ -119,4 +135,5 @@ window.getCurrentUser = getCurrentUser;
 window.getUserProfile = getUserProfile;
 window.updateProfile = updateProfile;
 
-console.log('✅ Auth.js loaded');
+console.log('Auth.js loaded');
+`
