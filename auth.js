@@ -217,13 +217,16 @@ function showWelcomeScreen() {
 }
 
 function hideWelcomeScreen() {
-  const welcome = document.querySelector('#screen-welcome');
-  if (welcome) welcome.classList.remove('active');
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
+    s.setAttribute('style', 'display: none !important;');
+  });
   const home = document.querySelector('#screen-home');
   if (home) {
     home.classList.add('active');
-    home.style.display = 'block';
+    home.setAttribute('style', 'display: block !important;');
   }
+  window.scrollTo(0, 0);
   localStorage.setItem(WELCOME_KEY, '1');
 }
 
@@ -251,16 +254,29 @@ function wireWelcomeButtons() {
 
 function initWelcomeScreen() {
   wireWelcomeButtons();
+  
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
+    s.setAttribute('style', 'display: none !important;');
+  });
+  
   if (shouldShowWelcome()) {
-    setTimeout(showWelcomeScreen, 100);
+    setTimeout(function() {
+      const welcome = document.querySelector('#screen-welcome');
+      if (welcome) {
+        welcome.classList.add('active');
+        welcome.setAttribute('style', 'display: block !important;');
+      }
+    }, 100);
   } else {
     const home = document.querySelector('#screen-home');
     if (home) {
       home.classList.add('active');
-      home.style.display = 'block';
+      home.setAttribute('style', 'display: block !important;');
     }
   }
 }
+``
 
 /* --------------- AUTH BUTTONS --------------- */
 
