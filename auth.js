@@ -52,9 +52,11 @@ async function updateProfile(userId, updates) {
   return result.data;
 }
 
-function updateAuthUI(user, profile) {  
+function updateAuthUI(user, profile) {
   currentAuthUser = user;
   currentAuthProfile = profile;
+
+  const banner = document.querySelector('#auth-banner');
   const userInfo = document.querySelector('#auth-user-info');
   const loginBtn = document.querySelector('#btn-google-login');
   const avatarEl = document.querySelector('#auth-avatar');
@@ -68,7 +70,7 @@ function updateAuthUI(user, profile) {
     } else if (user.user_metadata && user.user_metadata.full_name) {
       displayName = user.user_metadata.full_name;
     }
-    let avatar = 'U';
+    let avatar = '🎮';
     if (profile && profile.avatar_emoji) {
       avatar = profile.avatar_emoji;
     }
@@ -80,9 +82,11 @@ function updateAuthUI(user, profile) {
 
     if (userInfo) userInfo.style.display = 'flex';
     if (loginBtn) loginBtn.style.display = 'none';
+    if (banner) banner.style.display = 'flex';
   } else {
     if (userInfo) userInfo.style.display = 'none';
-    if (loginBtn) loginBtn.style.display = 'flex';
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (banner) banner.style.display = 'none';
   }
 }
 
