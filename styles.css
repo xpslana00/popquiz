@@ -584,6 +584,10 @@ html, body {
   flex-shrink: 0;
 }
 
+.auth-banner.auth-hidden {
+  display: none !important;
+}
+
 /* ============== WELCOME SCREEN ============== */
 #screen-welcome {
   position: fixed;
@@ -593,7 +597,7 @@ html, body {
     radial-gradient(600px 400px at 20% 10%, rgba(124, 92, 255, 0.15) 0%, transparent 60%),
     radial-gradient(500px 400px at 90% 90%, rgba(255, 92, 138, 0.12) 0%, transparent 60%),
     var(--bg);
-  padding: 0;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -826,7 +830,6 @@ html, body {
   box-shadow: 0 0 12px rgba(124, 92, 255, 0.4);
 }
 
-/* WELCOME FEATURES */
 .w-features {
   display: flex;
   justify-content: space-between;
@@ -857,7 +860,6 @@ html, body {
   font-weight: 600;
 }
 
-/* WELCOME ACTIONS */
 .w-actions {
   display: flex;
   flex-direction: column;
@@ -1079,59 +1081,16 @@ html, body {
     width: 200px;
     height: 400px;
   }
-  /* ============== iOS PWA SAFE AREA FIX ============== */
-
-/* Safe area padding pro všechny screens (iOS PWA notch/statusbar) */
-#screen-welcome {
-  padding-top: env(safe-area-inset-top) !important;
-  padding-bottom: env(safe-area-inset-bottom) !important;
 }
 
-.w-wrap {
-  padding-top: max(20px, env(safe-area-inset-top)) !important;
-  padding-bottom: max(30px, env(safe-area-inset-bottom)) !important;
-}
-
-/* Home screen taky */
-#screen-home,
-#screen-ranked-info,
-#screen-custom-setup,
-#screen-leaderboard,
-#screen-teams-setup,
-#screen-game,
-#screen-result {
-  padding-top: max(28px, env(safe-area-inset-top)) !important;
-}
-
-/* Fullscreen PWA na iOS */
-@supports (padding-top: env(safe-area-inset-top)) {
-  #app {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-}
-
-/* Extra padding pouze v PWA mode (standalone) */
+/* ============== iOS PWA SAFE AREA ============== */
 @media all and (display-mode: standalone) {
-  #screen-welcome .w-wrap {
-    padding-top: max(40px, env(safe-area-inset-top)) !important;
+  #app {
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
   }
 
-  #screen-home,
-  #screen-ranked-info,
-  #screen-custom-setup,
-  #screen-leaderboard,
-  #screen-teams-setup,
-  #screen-game,
-  #screen-result {
-    padding-top: max(48px, env(safe-area-inset-top)) !important;
-  }
-}
-
-/* iOS specifický fullscreen */
-@media all and (display-mode: fullscreen) {
   #screen-welcome .w-wrap {
-    padding-top: max(50px, env(safe-area-inset-top)) !important;
+    padding-top: max(40px, env(safe-area-inset-top));
   }
-}
 }
