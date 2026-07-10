@@ -407,11 +407,9 @@ async function startTeamsGame() {
 
 /* ============== RANKED MODE ============== */
 async function startRankedGame() {
-   if (typeof isSignedIn === 'function' && !isSignedIn()) {
-    alert('Pro Ranked hru se musis prihlasit pres Google. Klikni na tlacitko "Prihlasit se pres Google" nahore.');
-    const banner = document.querySelector('#auth-banner');
-    if (banner) {
-      banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (typeof isSignedIn === 'function' && !isSignedIn()) {
+    if (typeof signInWithGoogle === 'function') {
+      signInWithGoogle();
     }
     return;
   }
@@ -1073,7 +1071,35 @@ $("#btn-clear-leaderboard").onclick = () => {
 $("#btn-start-custom").onclick = startCustomGame;
 
 // Ranked mode start
-$("#btn-start-ranked")?.addEventListener("click", startRankedGame);
+// Ranked mode start - inteligentní tlačítko
+function updateRankedButton() {
+  const btn = document.querySelector('#btn-start-ranked');
+  if (!btn) return;
+
+  const signed = typeof isSignedIn === 'function' && isSignedIn();
+
+  if (signed) {
+    btn.innerHTML = '🚀 Zahájit Ranked hru';
+    btn.onclick = startRankedGame;
+  } else {
+    btn.innerHTML = '🔐 Přihlas se přes Google pro Ranked';
+    btn.onclick = () => {
+      if (typeof signInWithGoogle === 'function') {
+        signInWithGoogle();
+      }
+    };
+  }
+}
+
+// Zavolej při zobrazení Ranked screenu
+updateRankedButton();
+
+// Aktualizuj tlačítko při login/logout
+if (typeof sb !== 'undefined' && sb.auth) {
+  sb.auth.onAuthStateChange(() => {
+    setTimeout(updateRankedButton, 300);
+  });
+}
 
 renderHomeStats();
 
