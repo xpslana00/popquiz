@@ -92,6 +92,10 @@ sb.auth.onAuthStateChange(async function (event, session) {
     console.log('Uzivatel prihlasen:', session.user.email);
     const profile = await getUserProfile(session.user.id);
     updateAuthUI(session.user, profile);
+    
+    if (typeof hideWelcomeScreen === 'function') {
+      hideWelcomeScreen();
+    }
   } else if (event === 'SIGNED_OUT') {
     console.log('Uzivatel odhlasen');
     updateAuthUI(null, null);
@@ -231,4 +235,58 @@ window.saveScoreToCloud = saveScoreToCloud;
 window.getGlobalLeaderboard = getGlobalLeaderboard;
 window.getMyRankedHistory = getMyRankedHistory;
 
+/* --------------- WELCOME SCREEN --------------- */
+const WELCOME_KEY = 'popquiz.welcomeShown';
+
+function showWelcomeScreen() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const welcome = document.querySelector('#screen-welcome');
+  if (welcome) welcome.classList.add('active');
+}
+
+function hideWelcomeScreen() {
+  const welcome = document.querySelector('#screen-welcome');
+  if (welcome) welcome.classList.remove('active');
+  const home = document.querySelector('#screen-home');
+  if (home) home.classList.add('active');
+  localStorage.setItem(WELCOME_KEY, '1');
+}
+
+function shouldShowWelcome() {
+  if (typeof isSignedIn === 'function' && isSignedIn()) return false;
+  return localStorage.getItem(WELCOME_KEY) !== '1';
+}
+
+function wireWelcomeButtons() {
+  const googleBtn = document.querySelector('#btn-welcome-google');
+  const skipBtn = document.querySelector('#btn-welcome-skip');
+
+  if (googleBtn) {
+    googleBtn.onclick = () => {
+      if (typeof signInWithGoogle === 'function') {
+        signInWithGoogle();
+      }
+    };
+  }
+
+  if (skipBtn) {
+    skipBtn.onclick = hideWelcomeScreen;
+  }
+}
+
+function initWelcomeScreen() {
+  wireWelcomeButtons();
+  if (shouldShowWelcome()) {
+    setTimeout(showWelcomeScreen, 100);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initWelcomeScreen);
+} else {
+  initWelcomeScreen();
+}
+
+window.showWelcomeScreen = showWelcomeScreen;
+window.hideWelcomeScreen = hideWelcomeScreen;
 console.log('Auth.js loaded');
