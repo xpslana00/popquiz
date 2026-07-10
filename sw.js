@@ -1,5 +1,5 @@
 /* ============== POPQUIZ SERVICE WORKER ============== */
-const CACHE = "popquiz-v15";
+const CACHE = "popquiz-v16";
 
 // Soubory, které se uloží do cache při instalaci
 const ASSETS = [
