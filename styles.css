@@ -584,3 +584,9 @@ html, body {
   font-size: 0.85rem !important;
   flex-shrink: 0;
 }
+/* Highlight vlastního skóre v žebříčku */
+.leaderboard-item.leaderboard-me {
+  background: linear-gradient(135deg, rgba(124, 92, 255, 0.15), rgba(255, 92, 138, 0.1));
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(124, 92, 255, 0.3);
+}
