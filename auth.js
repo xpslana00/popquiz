@@ -116,17 +116,23 @@ function updateAuthUI(user, profile) {
   }
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
-  const loginBtn = document.querySelector('#btn-google-login');
-  const logoutBtn = document.querySelector('#btn-logout');
+function wireAuthButto**() {
+  const loginBtn = document.**erySelector('#btn-google-login');** const logoutBtn = document.query**l**tor('#btn-logout');
 
-  if (loginBtn) {
-    loginBtn.addEventListener('click', signInWithGoogle);
+  if (loginB**) {
+    loginBtn.onclick = signIn**thGoogle;
   }
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', signOut);
+**  logout**n.onclick = signOut;
   }
-});
+  consol**log('Auth buttons wired');
+}
+
+if **ocument.readyState === 'loading')**
+  document.addEventListener('DOM**ntentL**ded', wireAuthButtons);
+} else {
+  wireAuthButtons();
+}
 
 window.sb = sb;
 window.signInWithGoogle = signInWithGoogle;
