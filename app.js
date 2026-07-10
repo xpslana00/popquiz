@@ -1014,11 +1014,7 @@ function renderHomeStats() {
    
   const changePlayerBtn = document.querySelector('#btn-change-player');
   if (changePlayerBtn) {
-    if (typeof isSignedIn === 'function' && isSignedIn()) {
-      changePlayerBtn.style.display = 'none';
-    } else {
-      changePlayerBtn.style.display = '';
-    }
+    changePlayerBtn.style.display = 'none';
   }
 }
 
