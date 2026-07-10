@@ -92,18 +92,16 @@ function saveSeen(set) {
 }
 
 function showScreen(id) {
-  $$(".screen").forEach(s => s.classList.remove("active"));
-  const screen = $(`#${id}`);
-  if (screen) screen.classList.add("active");
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
+    s.setAttribute('style', 'display: none !important;');
+  });
+  const screen = document.querySelector('#' + id);
+  if (screen) {
+    screen.classList.add('active');
+    screen.setAttribute('style', 'display: block !important;');
+    window.scrollTo(0, 0);
+  }
 }
 
 /* ============== PLAYER + LOCAL LEADERBOARD ============== */
