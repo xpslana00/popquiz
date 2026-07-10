@@ -184,34 +184,61 @@ function getModeLabel(mode) {
   return labels[mode] || mode;
 }
 
-function renderLeaderboard() {
+async function renderLeaderboard() {
   const list = $("#leaderboard-list");
   if (!list) return;
 
-  const history = loadScoreHistory()
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 50);
+  showScreen("screen-leaderboard");
 
-  if (history.length === 0) {
-    list.innerHTML = `
-      <div class="empty-state">
-        Zatím tu není žádné skóre. Odehraj sólo nebo ranked hru a něco se tu objeví.
-      </div>
-    `;
-  } else {
-    list.innerHTML = history.map((r, i) => `
-      <div class="leaderboard-item">
-        <div class="leaderboard-rank">#${i + 1}</div>
-        <div>
-          <div class="leaderboard-name">${escapeHtml(r.name)}</div>
-          <div class="leaderboard-meta">${formatDateTime(r.date)} · ${r.total || "?"} otázek · ${getModeLabel(r.mode)}</div>
-        </div>
-        <div class="leaderboard-score">${r.score}</div>
-      </div>
-    `).join("");
+  const subtitle = document.querySelector("#screen-leaderboard .subtitle");
+  if (subtitle) subtitle.textContent = "Globalni zebricek vsech hracu (Ranked)";
+
+  list.innerHTML = '<div class="empty-state">Nacitam globalni zebricek...</div>';
+
+  const isLoggedIn = typeof isSignedIn === 'function' && isSignedIn();
+
+  if (typeof getGlobalLeaderboard !== 'function') {
+    list.innerHTML = '<div class="empty-state">Zebricek zatim neni k dispozici (auth se nenacetl).</div>';
+    return;
   }
 
-  showScreen("screen-leaderboard");
+  try {
+    const rows = await getGlobalLeaderboard(100);
+
+    if (!rows || rows.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          Zatim tu nikdo nema Ranked skore.<br>
+          ${isLoggedIn ? 'Bud prvni! Zahraj si Ranked hru.' : 'Prihlas se a bud prvni v zebricku!'}
+        </div>
+      `;
+      return;
+    }
+
+    const currentUserId = (typeof currentAuthUser !== 'undefined' && currentAuthUser) ? currentAuthUser.id : null;
+
+    list.innerHTML = rows.map((r, i) => {
+      const profile = r.profiles || {};
+      const name = profile.username || (profile.email ? profile.email.split('@')[0] : 'Anonym');
+      const avatar = profile.avatar_emoji || '🎮';
+      const isMe = currentUserId && r.user_id === currentUserId;
+      const highlight = isMe ? ' leaderboard-me' : '';
+
+      return `
+        <div class="leaderboard-item${highlight}">
+          <div class="leaderboard-rank">#${i + 1}</div>
+          <div>
+            <div class="leaderboard-name">${avatar} ${escapeHtml(name)}${isMe ? ' <span style="color:#ffd700">(Ty)</span>' : ''}</div>
+            <div class="leaderboard-meta">${formatDateTime(r.created_at)} · ${r.total_questions || 20} otazek · 🏆 Ranked</div>
+          </div>
+          <div class="leaderboard-score">${r.score}</div>
+        </div>
+      `;
+    }).join("");
+  } catch (err) {
+    console.error('Leaderboard error:', err);
+    list.innerHTML = '<div class="empty-state">Chyba pri nacitani zebricku. Zkus obnovit stranku.</div>';
+  }
 }
 
 /* ============== ZVUKY ============== */
@@ -1061,12 +1088,10 @@ $("#btn-change-player").onclick = () => {
   changePlayerName();
 };
 
-$("#btn-clear-leaderboard").onclick = () => {
-  if (confirm("Opravdu chceš vymazat lokální historii skóre na tomto zařízení?")) {
-    localStorage.removeItem(STORAGE.scoreHistory);
-    renderLeaderboard();
-  }
-};
+const clearBtn = document.querySelector('#btn-clear-leaderboard');
+if (clearBtn) {
+  clearBtn.style.display = 'none';
+}
 
 $("#btn-start-custom").onclick = startCustomGame;
 
