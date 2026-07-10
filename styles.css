@@ -485,3 +485,93 @@ html, body {
   color: var(--muted);
   text-align: center;
 }
+
+/* ============== AUTH BANNER ============== */
+.auth-banner {
+  margin: 20px 0 24px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(124, 92, 255, 0.08), rgba(255, 92, 138, 0.05));
+  border: 1px solid rgba(124, 92, 255, 0.2);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+}
+
+/* Login tlačítko Google */
+.google-login-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  color: #3c4043;
+  border: 0;
+  padding: 11px 22px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.google-login-btn:hover {
+  box-shadow: 0 4px 14px rgba(124, 92, 255, 0.35);
+}
+.google-login-btn:active {
+  transform: scale(0.97);
+}
+.google-login-btn svg {
+  flex-shrink: 0;
+}
+
+/* Přihlášený uživatel - info box */
+.auth-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.auth-avatar {
+  font-size: 1.6rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(124, 92, 255, 0.4);
+}
+
+.auth-details {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.auth-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.auth-email {
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-btn {
+  padding: 8px 12px !important;
+  font-size: 0.85rem !important;
+  flex-shrink: 0;
+}
