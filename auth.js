@@ -3,6 +3,12 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+/* --------------- STAV UZIVATELE (globalni) --------------- */
+let currentAuthUser = null;
+let currentAuthProfile = null;
+
+/* --------------- AUTH FUNKCE --------------- */
+
 async function signInWithGoogle() {
   console.log('Startuji Google login');
   const result = await sb.auth.signInWithOAuth({
@@ -52,6 +58,8 @@ async function updateProfile(userId, updates) {
   return result.data;
 }
 
+/* --------------- UI --------------- */
+
 function updateAuthUI(user, profile) {
   currentAuthUser = user;
   currentAuthProfile = profile;
@@ -82,13 +90,21 @@ function updateAuthUI(user, profile) {
 
     if (userInfo) userInfo.style.display = 'flex';
     if (loginBtn) loginBtn.style.display = 'none';
-    if (banner) banner.style.display = 'flex';
+    if (banner) {
+      banner.style.display = 'flex';
+      banner.classList.remove('auth-hidden');
+    }
   } else {
     if (userInfo) userInfo.style.display = 'none';
     if (loginBtn) loginBtn.style.display = 'none';
-    if (banner) banner.style.display = 'none';
+    if (banner) {
+      banner.style.display = 'none';
+      banner.classList.add('auth-hidden');
+    }
   }
 }
+
+/* --------------- AUTH EVENTS --------------- */
 
 sb.auth.onAuthStateChange(async function (event, session) {
   console.log('Auth event:', event);
@@ -96,7 +112,7 @@ sb.auth.onAuthStateChange(async function (event, session) {
     console.log('Uzivatel prihlasen:', session.user.email);
     const profile = await getUserProfile(session.user.id);
     updateAuthUI(session.user, profile);
-    
+
     if (typeof hideWelcomeScreen === 'function') {
       hideWelcomeScreen();
     }
@@ -106,51 +122,7 @@ sb.auth.onAuthStateChange(async function (event, session) {
   }
 });
 
-function wireAuthButtons() {
-  const loginBtn = document.querySelector('#btn-google-login');
-  const logoutBtn = document.querySelector('#btn-logout');
-
-  if (loginBtn) {
-    loginBtn.onclick = signInWithGoogle;
-  }
-  if (logoutBtn) {
-    logoutBtn.onclick = signOut;
-  }
-  console.log('Auth buttons wired');
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', wireAuthButtons);
-} else {
-  wireAuthButtons();
-}
-
-(async function () {
-  try {
-    const user = await getCurrentUser();
-    if (user) {
-      const profile = await getUserProfile(user.id);
-      updateAuthUI(user, profile);
-      console.log('Uzivatel je prihlasen:', user.email);
-    } else {
-      console.log('Uzivatel neni prihlasen');
-    }
-  } catch (err) {
-    console.error('Auth startup error:', err);
-  }
-})();
-
-window.sb = sb;
-window.signInWithGoogle = signInWithGoogle;
-window.signOut = signOut;
-window.getCurrentUser = getCurrentUser;
-window.getUserProfile = getUserProfile;
-window.updateProfile = updateProfile;
-
-
-/* --------------- STAV UZIVATELE (globalni) --------------- */
-let currentAuthUser = null;
-let currentAuthProfile = null;
+/* --------------- HELPERS --------------- */
 
 function isSignedIn() {
   return currentAuthUser !== null;
@@ -175,6 +147,8 @@ function getDisplayAvatar() {
   }
   return 'U';
 }
+
+/* --------------- CLOUD SCORE --------------- */
 
 async function saveScoreToCloud(scoreData) {
   if (!currentAuthUser) {
@@ -232,14 +206,8 @@ async function getMyRankedHistory(limit) {
   return result.data || [];
 }
 
-window.isSignedIn = isSignedIn;
-window.getDisplayName = getDisplayName;
-window.getDisplayAvatar = getDisplayAvatar;
-window.saveScoreToCloud = saveScoreToCloud;
-window.getGlobalLeaderboard = getGlobalLeaderboard;
-window.getMyRankedHistory = getMyRankedHistory;
-
 /* --------------- WELCOME SCREEN --------------- */
+
 const WELCOME_KEY = 'popquiz.welcomeShown';
 
 function showWelcomeScreen() {
@@ -252,7 +220,10 @@ function hideWelcomeScreen() {
   const welcome = document.querySelector('#screen-welcome');
   if (welcome) welcome.classList.remove('active');
   const home = document.querySelector('#screen-home');
-  if (home) home.classList.add('active');
+  if (home) {
+    home.classList.add('active');
+    home.style.display = 'block';
+  }
   localStorage.setItem(WELCOME_KEY, '1');
 }
 
@@ -266,7 +237,7 @@ function wireWelcomeButtons() {
   const skipBtn = document.querySelector('#btn-welcome-skip');
 
   if (googleBtn) {
-    googleBtn.onclick = () => {
+    googleBtn.onclick = function () {
       if (typeof signInWithGoogle === 'function') {
         signInWithGoogle();
       }
@@ -283,7 +254,6 @@ function initWelcomeScreen() {
   if (shouldShowWelcome()) {
     setTimeout(showWelcomeScreen, 100);
   } else {
-    // Uz jsme welcome videli - rovnou aktivuj home
     const home = document.querySelector('#screen-home');
     if (home) {
       home.classList.add('active');
@@ -292,12 +262,67 @@ function initWelcomeScreen() {
   }
 }
 
+/* --------------- AUTH BUTTONS --------------- */
+
+function wireAuthButtons() {
+  const loginBtn = document.querySelector('#btn-google-login');
+  const logoutBtn = document.querySelector('#btn-logout');
+
+  if (loginBtn) {
+    loginBtn.onclick = signInWithGoogle;
+  }
+  if (logoutBtn) {
+    logoutBtn.onclick = signOut;
+  }
+  console.log('Auth buttons wired');
+}
+
+/* --------------- INIT --------------- */
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initWelcomeScreen);
+  document.addEventListener('DOMContentLoaded', function () {
+    wireAuthButtons();
+    initWelcomeScreen();
+  });
 } else {
+  wireAuthButtons();
   initWelcomeScreen();
 }
 
+/* --------------- STARTUP CHECK --------------- */
+
+(async function () {
+  try {
+    const user = await getCurrentUser();
+    if (user) {
+      const profile = await getUserProfile(user.id);
+      updateAuthUI(user, profile);
+      console.log('Uzivatel je prihlasen:', user.email);
+    } else {
+      updateAuthUI(null, null);
+      console.log('Uzivatel neni prihlasen');
+    }
+  } catch (err) {
+    console.error('Auth startup error:', err);
+    updateAuthUI(null, null);
+  }
+})();
+
+/* --------------- EXPORTS --------------- */
+
+window.sb = sb;
+window.signInWithGoogle = signInWithGoogle;
+window.signOut = signOut;
+window.getCurrentUser = getCurrentUser;
+window.getUserProfile = getUserProfile;
+window.updateProfile = updateProfile;
+window.isSignedIn = isSignedIn;
+window.getDisplayName = getDisplayName;
+window.getDisplayAvatar = getDisplayAvatar;
+window.saveScoreToCloud = saveScoreToCloud;
+window.getGlobalLeaderboard = getGlobalLeaderboard;
+window.getMyRankedHistory = getMyRankedHistory;
 window.showWelcomeScreen = showWelcomeScreen;
 window.hideWelcomeScreen = hideWelcomeScreen;
+
 console.log('Auth.js loaded');
