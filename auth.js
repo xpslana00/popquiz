@@ -282,6 +282,13 @@ function initWelcomeScreen() {
   wireWelcomeButtons();
   if (shouldShowWelcome()) {
     setTimeout(showWelcomeScreen, 100);
+  } else {
+    // Uz jsme welcome videli - rovnou aktivuj home
+    const home = document.querySelector('#screen-home');
+    if (home) {
+      home.classList.add('active');
+      home.style.display = 'block';
+    }
   }
 }
 
