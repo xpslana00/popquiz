@@ -52,7 +52,9 @@ async function updateProfile(userId, updates) {
   return result.data;
 }
 
-function updateAuthUI(user, profile) {
+function updateAuthUI(user, profile) {  
+  currentAuthUser = user;
+  currentAuthProfile = profile;
   const userInfo = document.querySelector('#auth-user-info');
   const loginBtn = document.querySelector('#btn-google-login');
   const avatarEl = document.querySelector('#auth-avatar');
@@ -136,5 +138,97 @@ window.signOut = signOut;
 window.getCurrentUser = getCurrentUser;
 window.getUserProfile = getUserProfile;
 window.updateProfile = updateProfile;
+
+
+/* --------------- STAV UZIVATELE (globalni) --------------- */
+let currentAuthUser = null;
+let currentAuthProfile = null;
+
+function isSignedIn() {
+  return currentAuthUser !== null;
+}
+
+function getDisplayName() {
+  if (currentAuthProfile && currentAuthProfile.username) {
+    return currentAuthProfile.username;
+  }
+  if (currentAuthUser && currentAuthUser.user_metadata && currentAuthUser.user_metadata.full_name) {
+    return currentAuthUser.user_metadata.full_name;
+  }
+  if (currentAuthUser && currentAuthUser.email) {
+    return currentAuthUser.email.split('@')[0];
+  }
+  return 'Hrac';
+}
+
+function getDisplayAvatar() {
+  if (currentAuthProfile && currentAuthProfile.avatar_emoji) {
+    return currentAuthProfile.avatar_emoji;
+  }
+  return 'U';
+}
+
+async function saveScoreToCloud(scoreData) {
+  if (!currentAuthUser) {
+    console.log('Score not saved - user not signed in');
+    return null;
+  }
+  const payload = {
+    user_id: currentAuthUser.id,
+    score: scoreData.score || 0,
+    mode: scoreData.mode || 'solo',
+    total_questions: scoreData.total_questions || 0,
+    correct_answers: scoreData.correct_answers || 0,
+    time_taken_seconds: scoreData.time_taken_seconds || null,
+    categories: scoreData.categories || null,
+    difficulties: scoreData.difficulties || null
+  };
+  const result = await sb.from('scores').insert(payload).select().single();
+  if (result.error) {
+    console.error('Save score error:', result.error);
+    return null;
+  }
+  console.log('Score saved to cloud:', result.data);
+  return result.data;
+}
+
+async function getGlobalLeaderboard(limit) {
+  const max = limit || 100;
+  const result = await sb
+    .from('scores')
+    .select('id, score, mode, total_questions, correct_answers, created_at, profiles(username, avatar_emoji, email)')
+    .eq('mode', 'ranked')
+    .order('score', { ascending: false })
+    .limit(max);
+  if (result.error) {
+    console.error('Leaderboard fetch error:', result.error);
+    return [];
+  }
+  return result.data || [];
+}
+
+async function getMyRankedHistory(limit) {
+  if (!currentAuthUser) return [];
+  const max = limit || 20;
+  const result = await sb
+    .from('scores')
+    .select('*')
+    .eq('user_id', currentAuthUser.id)
+    .eq('mode', 'ranked')
+    .order('created_at', { ascending: false })
+    .limit(max);
+  if (result.error) {
+    console.error('History fetch error:', result.error);
+    return [];
+  }
+  return result.data || [];
+}
+
+window.isSignedIn = isSignedIn;
+window.getDisplayName = getDisplayName;
+window.getDisplayAvatar = getDisplayAvatar;
+window.saveScoreToCloud = saveScoreToCloud;
+window.getGlobalLeaderboard = getGlobalLeaderboard;
+window.getMyRankedHistory = getMyRankedHistory;
 
 console.log('Auth.js loaded');
