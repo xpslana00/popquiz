@@ -3,6 +3,17 @@
    Custom mode + player name + local leaderboard + Ranked mode
    =================================================================== */
 
+/* ============== ESCAPE HTML (bezpečnostní helper) ============== */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 /* ============== ULOŽIŠTĚ ============== */
 const STORAGE = {
   seen: "popquiz.seenIds",
@@ -28,7 +39,7 @@ const RANKED_CONFIG = {
 
 /* ============== STAV APLIKACE ============== */
 const state = {
-  mode: null, // solo | moderator | teams | ranked
+  mode: null,
   questions: [],
   index: 0,
   score: 0,
@@ -204,12 +215,7 @@ async function renderLeaderboard() {
     const rows = await getGlobalLeaderboard(100);
 
     if (!rows || rows.length === 0) {
-      list.innerHTML = `
-        <div class="empty-state">
-          Zatim tu nikdo nema Ranked skore.<br>
-          ${isLoggedIn ? 'Bud prvni! Zahraj si Ranked hru.' : 'Prihlas se a bud prvni v zebricku!'}
-        </div>
-      `;
+      list.innerHTML = '<div class="empty-state">Zatim tu nikdo nema Ranked skore.<br>' + (isLoggedIn ? 'Bud prvni! Zahraj si Ranked hru.' : 'Prihlas se a bud prvni v zebricku!') + '</div>';
       return;
     }
 
@@ -222,16 +228,14 @@ async function renderLeaderboard() {
       const isMe = currentUserId && r.user_id === currentUserId;
       const highlight = isMe ? ' leaderboard-me' : '';
 
-      return `
-        <div class="leaderboard-item${highlight}">
-          <div class="leaderboard-rank">#${i + 1}</div>
-          <div>
-            <div class="leaderboard-name">${avatar} ${escapeHtml(name)}${isMe ? ' <span style="color:#ffd700">(Ty)</span>' : ''}</div>
-            <div class="leaderboard-meta">${formatDateTime(r.created_at)} · ${r.total_questions || 20} otazek · 🏆 Ranked</div>
-          </div>
-          <div class="leaderboard-score">${r.score}</div>
-        </div>
-      `;
+      return '<div class="leaderboard-item' + highlight + '">' +
+        '<div class="leaderboard-rank">#' + (i + 1) + '</div>' +
+        '<div>' +
+          '<div class="leaderboard-name">' + avatar + ' ' + escapeHtml(name) + (isMe ? ' <span style="color:#ffd700">(Ty)</span>' : '') + '</div>' +
+          '<div class="leaderboard-meta">' + formatDateTime(r.created_at) + ' · ' + (r.total_questions || 20) + ' otazek · 🏆 Ranked</div>' +
+        '</div>' +
+        '<div class="leaderboard-score">' + r.score + '</div>' +
+      '</div>';
     }).join("");
   } catch (err) {
     console.error('Leaderboard error:', err);
@@ -451,7 +455,6 @@ async function startRankedGame() {
 
   const all = await loadAllQuestions();
 
-  // Ranked = úplně random mix ze všech otázek, žádný filtr, žádné seen tracking
   state.questions = shuffle(all).slice(0, RANKED_CONFIG.count);
   state.total = state.questions.length;
 
@@ -486,11 +489,9 @@ function renderTeamsEditor() {
     const row = document.createElement("div");
     row.className = "team-row";
 
-    row.innerHTML = `
-      <span class="team-color" style="background:${t.color}"></span>
-      <input type="text" value="${escapeHtml(t.name)}" data-i="${i}" />
-      <button data-rm="${i}">×</button>
-    `;
+    row.innerHTML = '<span class="team-color" style="background:' + t.color + '"></span>' +
+      '<input type="text" value="' + escapeHtml(t.name) + '" data-i="' + i + '" />' +
+      '<button data-rm="' + i + '">×</button>';
 
     row.querySelector("input").oninput = (e) => {
       state.teams[i].name = e.target.value;
@@ -529,8 +530,8 @@ function renderQuestion() {
     ({ easy: "● Lehká", medium: "●● Střední", hard: "●●● Těžká" })[q.difficulty] || "";
 
   $("#question-text").textContent = q.question;
-  $("#progress-text").textContent = `${state.index + 1} / ${state.total}`;
-  $("#progress-fill").style.width = `${(state.index / state.total) * 100}%`;
+  $("#progress-text").textContent = (state.index + 1) + ' / ' + state.total;
+  $("#progress-fill").style.width = ((state.index / state.total) * 100) + '%';
 
   const showScore = state.mode === "solo" || state.mode === "ranked";
   $("#score-badge").textContent = showScore ? state.score : "—";
@@ -622,13 +623,12 @@ function handleSoloAnswer(btn, picked, q) {
     const streakBonus = state.streak >= 3 ? 50 : 0;
     let gain = 100 + timeBonus + streakBonus;
 
-    // Ranked mode – násobič obtížnosti
     let difficultyBadge = "";
     if (state.mode === "ranked") {
       const multiplier = RANKED_CONFIG.difficultyMultiplier[q.difficulty] || 1;
       gain = Math.round(gain * multiplier);
       if (multiplier > 1) {
-        difficultyBadge = ` <span style="color:#ffd700">×${multiplier}</span>`;
+        difficultyBadge = ' <span style="color:#ffd700">×' + multiplier + '</span>';
       }
     }
 
@@ -636,18 +636,15 @@ function handleSoloAnswer(btn, picked, q) {
     audio.correct();
 
     fb.classList.add("ok");
-    fb.innerHTML = `
-      <h3>Správně! 🎉</h3>
-      <p>+${gain} bodů${difficultyBadge}${streakBonus ? ` (série ×${state.streak} 🔥)` : ""}</p>
-    `;
+    fb.innerHTML = '<h3>Správně! 🎉</h3><p>+' + gain + ' bodů' + difficultyBadge + (streakBonus ? ' (série ×' + state.streak + ' 🔥)' : '') + '</p>';
   } else {
     state.streak = 0;
     audio.wrong();
 
     fb.classList.add("err");
     fb.innerHTML = picked === -1
-      ? `<h3>Čas vypršel! ⏰</h3><p>Správně bylo: <b>${q.answers[correct]}</b></p>`
-      : `<h3>Špatně 😬</h3><p>Správně bylo: <b>${q.answers[correct]}</b></p>`;
+      ? '<h3>Čas vypršel! ⏰</h3><p>Správně bylo: <b>' + escapeHtml(q.answers[correct]) + '</b></p>'
+      : '<h3>Špatně 😬</h3><p>Správně bylo: <b>' + escapeHtml(q.answers[correct]) + '</b></p>';
   }
 
   const nextDelay = state.mode === "ranked" ? 1500 : 1800;
@@ -677,12 +674,7 @@ function renderModerator(q) {
     const item = document.createElement("div");
     item.className = "hint-item";
 
-    item.innerHTML = `
-      <div style="flex:1">
-        <button>💡 Nápověda ${i + 1}</button>
-        <div class="hint-text">${escapeHtml(hint)}</div>
-      </div>
-    `;
+    item.innerHTML = '<div style="flex:1"><button>💡 Nápověda ' + (i + 1) + '</button><div class="hint-text">' + escapeHtml(hint) + '</div></div>';
 
     item.querySelector("button").onclick = () => {
       item.classList.add("used");
@@ -719,11 +711,9 @@ function renderTeamsScoring(q) {
     const b = document.createElement("button");
     b.className = "team-score-btn";
 
-    b.innerHTML = `
-      <span class="team-color" style="background:${t.color}"></span>
-      <span style="flex:1;text-align:left">${escapeHtml(t.name)}</span>
-      <span>+${points}</span>
-    `;
+    b.innerHTML = '<span class="team-color" style="background:' + t.color + '"></span>' +
+      '<span style="flex:1;text-align:left">' + escapeHtml(t.name) + '</span>' +
+      '<span>+' + points + '</span>';
 
     b.onclick = () => {
       if (b.classList.contains("awarded")) return;
@@ -743,12 +733,12 @@ function renderScoreboard() {
   const board = $("#teams-scoreboard");
   const max = Math.max(...state.teams.map(t => t.score));
 
-  board.innerHTML = state.teams.map(t => `
-    <div class="team-pill ${t.score === max && max > 0 ? "leader" : ""}">
-      <span class="team-color" style="background:${t.color}"></span>
-      ${escapeHtml(t.name)}: <b>${t.score}</b>
-    </div>
-  `).join("");
+  board.innerHTML = state.teams.map(t => 
+    '<div class="team-pill ' + (t.score === max && max > 0 ? "leader" : "") + '">' +
+      '<span class="team-color" style="background:' + t.color + '"></span>' +
+      escapeHtml(t.name) + ': <b>' + t.score + '</b>' +
+    '</div>'
+  ).join("");
 }
 
 /* ============== CUSTOM MODE ============== */
@@ -831,17 +821,16 @@ function updateCustomSummary() {
 
   const timer = customConfig.timerSec === 0
     ? "Bez časovače"
-    : `${customConfig.timerSec} s`;
+    : customConfig.timerSec + ' s';
 
   const gametype = ({ solo: "Sólo", moderator: "Moderátor", teams: "Týmy" })[customConfig.gameType];
 
-  $("#custom-summary").innerHTML = `
-    <b>Kategorie:</b> ${cats}<br>
-    <b>Obtížnost:</b> ${diffs}<br>
-    <b>Otázek:</b> ${customConfig.count}<br>
-    <b>Časovač:</b> ${timer}<br>
-    <b>Režim:</b> ${gametype}
-  `;
+  $("#custom-summary").innerHTML = 
+    '<b>Kategorie:</b> ' + cats + '<br>' +
+    '<b>Obtížnost:</b> ' + diffs + '<br>' +
+    '<b>Otázek:</b> ' + customConfig.count + '<br>' +
+    '<b>Časovač:</b> ' + timer + '<br>' +
+    '<b>Režim:</b> ' + gametype;
 }
 
 async function startCustomGame() {
@@ -904,42 +893,37 @@ function finishGame() {
   if (state.mode === "teams") {
     const sorted = [...state.teams].sort((a, b) => b.score - a.score);
 
-    $("#result-title").textContent = `Vítěz: ${sorted[0].name} 🏆`;
-    $("#result-body").innerHTML = `
-      <div class="teams-editor">
-        ${sorted.map((t, i) => `
-          <div class="team-row">
-            <span style="font-weight:600">#${i + 1}</span>
-            <span class="team-color" style="background:${t.color}"></span>
-            <span style="flex:1">${escapeHtml(t.name)}</span>
-            <b>${t.score}</b>
-          </div>
-        `).join("")}
-      </div>
-    `;
+    $("#result-title").textContent = 'Vítěz: ' + sorted[0].name + ' 🏆';
+    $("#result-body").innerHTML = '<div class="teams-editor">' +
+      sorted.map((t, i) => 
+        '<div class="team-row">' +
+          '<span style="font-weight:600">#' + (i + 1) + '</span>' +
+          '<span class="team-color" style="background:' + t.color + '"></span>' +
+          '<span style="flex:1">' + escapeHtml(t.name) + '</span>' +
+          '<b>' + t.score + '</b>' +
+        '</div>'
+      ).join("") +
+    '</div>';
   } else if (state.mode === "ranked") {
-    // Speciální výsledek pro Ranked mode
     audio.fanfare();
     const player = getPlayerName() || "Hráč";
     const rank = getRankedRank(state.score);
 
     $("#result-title").textContent = "🏆 Ranked hotovo!";
-    $("#result-body").innerHTML = `
-      <p class="big-score">${state.score} bodů</p>
-      <p class="subtitle">${player}</p>
-      <div class="ranked-result-card">
-        ${rank ? `<p><b>Tvůj rank:</b> #${rank.position} z ${rank.total} her</p>` : ""}
-        <p class="subtitle">${
+    $("#result-body").innerHTML = '<p class="big-score">' + state.score + ' bodů</p>' +
+      '<p class="subtitle">' + escapeHtml(player) + '</p>' +
+      '<div class="ranked-result-card">' +
+        (rank ? '<p><b>Tvůj rank:</b> #' + rank.position + ' z ' + rank.total + ' her</p>' : '') +
+        '<p class="subtitle">' + (
           state.score >= 3000 ? "🌟 Legendární výkon!" :
           state.score >= 2000 ? "🔥 Skvělá hra!" :
           state.score >= 1000 ? "👏 Slušný výkon" :
           "💪 Příště lépe!"
-        }</p>
-      </div>
-    `;
+        ) + '</p>' +
+      '</div>';
 
     updateStats(state.score);
-     
+
     if (typeof saveScoreToCloud === 'function' && typeof isSignedIn === 'function' && isSignedIn()) {
       saveScoreToCloud({
         score: state.score,
@@ -954,20 +938,18 @@ function finishGame() {
     }
   } else if (state.mode === "solo") {
     $("#result-title").textContent = "Hotovo! 🎉";
-    $("#result-body").innerHTML = `
-      <p class="big-score">${state.score} bodů</p>
-      <p class="subtitle">${
+    $("#result-body").innerHTML = '<p class="big-score">' + state.score + ' bodů</p>' +
+      '<p class="subtitle">' + (
         state.score >= 2500 ? "Hvězdná hra! 🌟" :
         state.score >= 1500 ? "Skvěle 👏" :
         state.score >= 500 ? "Slušné, dá se víc." :
         "Příště to bude lepší 💪"
-      }</p>
-    `;
+      ) + '</p>';
 
     updateStats(state.score);
   } else {
     $("#result-title").textContent = "Hotovo 🎤";
-    $("#result-body").innerHTML = `<p class="subtitle">Konec moderování</p>`;
+    $("#result-body").innerHTML = '<p class="subtitle">Konec moderování</p>';
   }
 
   showScreen("screen-result");
@@ -1007,9 +989,9 @@ function renderHomeStats() {
   }
 
   $("#footer-stats").innerHTML = s.gamesPlayed
-    ? `Hráč: <b>${escapeHtml(player)}</b> · Odehráno: <b>${s.gamesPlayed}</b> · Nejlepší skóre: <b>${s.bestScore}</b> · Viděno otázek: <b>${seenCount}</b>`
-    : `Hráč: <b>${escapeHtml(player)}</b> · Zatím jsi nehrál. Pusť se do toho! 🚀`;
-   
+    ? 'Hráč: <b>' + escapeHtml(player) + '</b> · Odehráno: <b>' + s.gamesPlayed + '</b> · Nejlepší skóre: <b>' + s.bestScore + '</b> · Viděno otázek: <b>' + seenCount + '</b>'
+    : 'Hráč: <b>' + escapeHtml(player) + '</b> · Zatím jsi nehrál. Pusť se do toho! 🚀';
+
   const changePlayerBtn = document.querySelector('#btn-change-player');
   if (changePlayerBtn) {
     changePlayerBtn.style.display = 'none';
@@ -1089,8 +1071,7 @@ if (clearBtn) {
 
 $("#btn-start-custom").onclick = startCustomGame;
 
-// Ranked mode start
-// Ranked mode start - inteligentní tlačítko
+/* ============== RANKED SMART BUTTON ============== */
 function updateRankedButton() {
   const btn = document.querySelector('#btn-start-ranked');
   if (!btn) return;
@@ -1110,10 +1091,8 @@ function updateRankedButton() {
   }
 }
 
-// Zavolej při zobrazení Ranked screenu
 updateRankedButton();
 
-// Aktualizuj tlačítko při login/logout
 if (typeof sb !== 'undefined' && sb.auth) {
   sb.auth.onAuthStateChange(() => {
     setTimeout(updateRankedButton, 300);
@@ -1131,7 +1110,6 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-
 /* ============== SYNC STATS BAR WITH AUTH ============== */
 if (typeof sb !== 'undefined' && sb.auth) {
   sb.auth.onAuthStateChange(() => {
@@ -1142,4 +1120,3 @@ if (typeof sb !== 'undefined' && sb.auth) {
     }, 200);
   });
 }
-``
