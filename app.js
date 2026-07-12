@@ -128,12 +128,28 @@ function ensurePlayerName() {
   let name = getPlayerName();
 
   if (!name) {
-    name = prompt("Jak ti říkáme? Jméno se použije pro lokální žebříček.") || "Hráč";
-    name = name.trim() || "Hráč";
+    const input = prompt("Jak ti říkáme? Zadej prosím přezdívku pro hru a lokální žebříček.", "");
+    if (input === null) return "";
+    name = input.trim();
+    if (!name) return "";
     setPlayerName(name);
   }
 
   return name;
+}
+
+function requirePlayerNameForGuest() {
+  if (typeof isSignedIn === 'function' && isSignedIn()) {
+    return true;
+  }
+
+  const name = ensurePlayerName();
+  if (!name) {
+    alert("Pro hraní bez přihlášení zadej prosím přezdívku.");
+    return false;
+  }
+
+  return true;
 }
 
 function changePlayerName() {
@@ -200,9 +216,9 @@ async function renderLeaderboard() {
   showScreen("screen-leaderboard");
 
   const subtitle = document.querySelector("#screen-leaderboard .subtitle");
-  if (subtitle) subtitle.textContent = "Globalni zebricek vsech hracu (Ranked)";
+  if (subtitle) subtitle.textContent = "Globální žebříček všech hráčů (Ranked)";
 
-  list.innerHTML = '<div class="empty-state">Nacitam globalni zebricek...</div>';
+  list.innerHTML = '<div class="empty-state">Načítám globální žebříček...</div>';
 
   const isLoggedIn = typeof isSignedIn === 'function' && isSignedIn();
 
@@ -215,7 +231,7 @@ async function renderLeaderboard() {
     const rows = await getGlobalLeaderboard(100);
 
     if (!rows || rows.length === 0) {
-      list.innerHTML = '<div class="empty-state">Zatim tu nikdo nema Ranked skore.<br>' + (isLoggedIn ? 'Bud prvni! Zahraj si Ranked hru.' : 'Prihlas se a bud prvni v zebricku!') + '</div>';
+      list.innerHTML = '<div class="empty-state">Zatím tu nikdo nemá Ranked skóre.<br>' + (isLoggedIn ? 'Buď první! Zahraj si Ranked hru.' : 'Přihlas se a buď první v žebříčku!') + '</div>';
       return;
     }
 
@@ -241,58 +257,19 @@ async function renderLeaderboard() {
     }).join("");
   } catch (err) {
     console.error('Leaderboard error:', err);
-    list.innerHTML = '<div class="empty-state">Chyba pri nacitani zebricku. Zkus obnovit stranku.</div>';
+    list.innerHTML = '<div class="empty-state">Chyba při načítání žebříčku. Zkus obnovit stránku.</div>';
   }
 }
 
 /* ============== ZVUKY ============== */
-const audio = (() => {
-  let ctx = null;
-
-  const init = () => {
-    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-  };
-
-  function beep(freq = 600, duration = 0.12, type = "sine", vol = 0.15) {
-    if (!state.settings.sound) return;
-
-    init();
-
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-
-    o.type = type;
-    o.frequency.value = freq;
-    g.gain.value = vol;
-
-    o.connect(g);
-    g.connect(ctx.destination);
-
-    o.start();
-    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-    o.stop(ctx.currentTime + duration);
-  }
-
-  return {
-    correct: () => {
-      beep(880, 0.1, "sine");
-      setTimeout(() => beep(1320, 0.15, "sine"), 100);
-    },
-    wrong: () => beep(220, 0.18, "sawtooth"),
-    tick: () => beep(1200, 0.04, "square", 0.05),
-    timeUp: () => {
-      beep(440, 0.2, "square");
-      setTimeout(() => beep(330, 0.3, "square"), 150);
-    },
-    click: () => beep(700, 0.04, "square", 0.06),
-    fanfare: () => {
-      beep(523, 0.15, "sine", 0.15);
-      setTimeout(() => beep(659, 0.15, "sine", 0.15), 100);
-      setTimeout(() => beep(784, 0.15, "sine", 0.15), 200);
-      setTimeout(() => beep(1047, 0.3, "sine", 0.2), 300);
-    }
-  };
-})();
+const audio = (() => ({
+  correct: () => {},
+  wrong: () => {},
+  tick: () => {},
+  timeUp: () => {},
+  click: () => {},
+  fanfare: () => {}
+}))();
 
 /* ============== NAČTENÍ OTÁZEK + RANDOMIZER ============== */
 async function loadAllQuestions() {
@@ -377,6 +354,10 @@ async function startGame(mode) {
     return;
   }
 
+  if (mode === "solo") {
+    if (!requirePlayerNameForGuest()) return;
+  }
+
   state.mode = mode;
   state.index = 0;
   state.score = 0;
@@ -438,6 +419,8 @@ async function startTeamsGame() {
 
 /* ============== RANKED MODE ============== */
 async function startRankedGame() {
+  if (!requirePlayerNameForGuest()) return;
+
   if (typeof isSignedIn === 'function' && !isSignedIn()) {
     if (typeof signInWithGoogle === 'function') {
       signInWithGoogle();
@@ -1096,18 +1079,14 @@ function updateRankedButton() {
 const welcomePlayBtn = document.querySelector('#btn-welcome-play');
 if (welcomePlayBtn) {
   welcomePlayBtn.onclick = () => {
-    if (typeof hideWelcomeScreen === 'function') {
-      hideWelcomeScreen();
-    }
+    window.location.href = './app/';
   };
 }
 
 const welcomeEnterBtn = document.querySelector('#btn-welcome-enter');
 if (welcomeEnterBtn) {
   welcomeEnterBtn.onclick = () => {
-    if (typeof hideWelcomeScreen === 'function') {
-      hideWelcomeScreen();
-    }
+    window.location.href = './app/';
   };
 }
 
@@ -1119,7 +1098,17 @@ if (typeof sb !== 'undefined' && sb.auth) {
   });
 }
 
-renderHomeStats();
+const isAppRoute = window.location.pathname.includes('/app') || new URLSearchParams(window.location.search).get('view') === 'app';
+if (isAppRoute) {
+  document.body.classList.add('app-shell');
+  if (typeof hideWelcomeScreen === 'function') {
+    hideWelcomeScreen();
+  } else {
+    showScreen('screen-home');
+  }
+} else {
+  renderHomeStats();
+}
 
 /* ============== REGISTRACE SERVICE WORKERU ============== */
 if ("serviceWorker" in navigator) {
