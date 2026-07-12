@@ -152,6 +152,10 @@ function requirePlayerNameForGuest() {
   return true;
 }
 
+function shouldRequirePlayerName(mode) {
+  return mode === 'solo';
+}
+
 function changePlayerName() {
   const current = getPlayerName() || "Hráč";
   const next = prompt("Zadej nové jméno hráče:", current);
@@ -239,7 +243,8 @@ async function renderLeaderboard() {
 
     list.innerHTML = rows.map((r, i) => {
       const profile = r.profiles || {};
-      const name = profile.username || (profile.email ? profile.email.split('@')[0] : 'Anonym');
+      const rawName = profile.username || (profile.email ? profile.email.split('@')[0] : 'Anonym');
+      const name = rawName.length > 16 ? rawName.slice(0, 13) + '…' : rawName;
       const avatar = profile.avatar_emoji || '🎮';
       const isMe = currentUserId && r.user_id === currentUserId;
       const highlight = isMe ? ' leaderboard-me' : '';
@@ -354,9 +359,7 @@ async function startGame(mode) {
     return;
   }
 
-  if (mode === "solo") {
-    if (!requirePlayerNameForGuest()) return;
-  }
+  if (shouldRequirePlayerName(mode) && !requirePlayerNameForGuest()) return;
 
   state.mode = mode;
   state.index = 0;
