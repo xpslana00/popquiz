@@ -193,6 +193,12 @@ const CZECH_TEXT_REPLACEMENTS = [
   [/\bdrobnosti\b/g, "drobnosti"],
   [/\bnemoci\b/g, "nemoci"],
   [/\bpratele\b/g, "přátele"],
+  [/\bdlouha\b/g, "dlouhá"],
+  [/\bdlouhe\b/g, "dlouhé"],
+  [/\bdlouhy\b/g, "dlouhý"],
+  [/\bdlkouh[aá]\b/g, "dlouhá"],
+  [/\bdlkouh[eé]\b/g, "dlouhé"],
+  [/\bdlkouh[yý]\b/g, "dlouhý"],
   [/\bteoreticky\b/g, "teoretický"],
   [/\bspolecna\b/g, "společná"],
   [/\bvecere\b/g, "večeře"]
@@ -550,28 +556,29 @@ async function loadAllQuestions() {
   const baseQuestions = await r.json();
 
   return [
-    ...baseQuestions,
+    ...normalizeQuestionSet(baseQuestions),
     ...normalizeQuestionSet(hpModule.harryPotterQuestions),
     ...normalizeQuestionSet(bbtModule.bigBangTheoryQuestions)
   ];
 }
 
 function normalizeCzechText(value) {
-  let result = String(value);
+  let result = String(value ?? '').normalize('NFC');
 
   CZECH_TEXT_REPLACEMENTS.forEach(([pattern, replacement]) => {
     result = result.replace(pattern, replacement);
   });
 
-  return result;
+  return result.normalize('NFC');
 }
 
 function normalizeQuestionSet(questions) {
   return questions.map((question) => ({
     ...question,
+    category: normalizeCzechText(question.category),
     question: normalizeCzechText(question.question),
-    answers: question.answers.map(normalizeCzechText),
-    hints: question.hints.map(normalizeCzechText)
+    answers: Array.isArray(question.answers) ? question.answers.map(normalizeCzechText) : [],
+    hints: Array.isArray(question.hints) ? question.hints.map(normalizeCzechText) : []
   }));
 }
 
