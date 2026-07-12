@@ -213,6 +213,22 @@ function getModeLabel(mode) {
   return labels[mode] || mode;
 }
 
+function formatLeaderboardName(name) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    const first = parts[0];
+    const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
+    return first + ' ' + lastInitial + '.';
+  }
+
+  const trimmed = name.trim();
+  if (trimmed.length > 16) {
+    return trimmed.slice(0, 13) + '…';
+  }
+
+  return trimmed;
+}
+
 async function renderLeaderboard() {
   const list = $("#leaderboard-list");
   if (!list) return;
@@ -244,7 +260,7 @@ async function renderLeaderboard() {
     list.innerHTML = rows.map((r, i) => {
       const profile = r.profiles || {};
       const rawName = profile.username || (profile.email ? profile.email.split('@')[0] : 'Anonym');
-      const name = rawName.length > 16 ? rawName.slice(0, 13) + '…' : rawName;
+      const name = formatLeaderboardName(rawName);
       const avatar = profile.avatar_emoji || '🎮';
       const isMe = currentUserId && r.user_id === currentUserId;
       const highlight = isMe ? ' leaderboard-me' : '';

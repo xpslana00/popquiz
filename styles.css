@@ -88,8 +88,14 @@ body.app-shell #app {
   display: grid;
   gap: 16px;
   grid-template-columns: 1fr;
+  justify-items: center;
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding-inline: 12px;
 }
 .mode-card {
+  width: 100%;
+  max-width: 760px;
   background: var(--card);
   border: 1px solid var(--card-border);
   color: var(--text);
@@ -125,6 +131,11 @@ body.app-shell #app {
   .hero {
     padding: 22px;
     margin-top: 8px;
+  }
+
+  .mode-cards {
+    width: 100%;
+    padding-inline: 0;
   }
 
   .home-actions {
