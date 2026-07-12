@@ -113,7 +113,7 @@ sb.auth.onAuthStateChange(async function (event, session) {
     const profile = await getUserProfile(session.user.id);
     updateAuthUI(session.user, profile);
 
-    if (typeof hideWelcomeScreen === 'function') {
+    if (typeof hideWelcomeScreen === 'function' && (window.location.pathname.includes('/app') || new URLSearchParams(window.location.search).get('view') === 'app')) {
       hideWelcomeScreen();
     }
   } else if (event === 'SIGNED_OUT') {
@@ -236,7 +236,12 @@ const WELCOME_KEY = 'popquiz.welcomeShown';
 function showWelcomeScreen() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const welcome = document.querySelector('#screen-welcome');
+  const home = document.querySelector('#screen-home');
   if (welcome) welcome.classList.add('active');
+  if (home) {
+    home.classList.remove('active');
+    home.setAttribute('style', 'display: none !important;');
+  }
 }
 
 function hideWelcomeScreen() {
@@ -293,6 +298,10 @@ function initWelcomeScreen() {
       if (welcome) {
         welcome.classList.add('active');
         welcome.setAttribute('style', 'display: block !important;');
+      }
+      if (home) {
+        home.classList.remove('active');
+        home.setAttribute('style', 'display: none !important;');
       }
     }, 100);
   } else {
