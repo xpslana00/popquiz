@@ -54,7 +54,7 @@ const state = {
 
 const TEAM_COLORS = ["#7c5cff", "#22c55e", "#f59e0b", "#3b82f6", "#ec4899", "#06b6d4"];
 const TEAM_NAMES_DEFAULT = ["Fialoví", "Zelení", "Oranžoví", "Modří", "Růžoví", "Tyrkysoví"];
-const DATASET_VERSION = "20260712-5";
+const DATASET_VERSION = "20260712-8";
 const BOOSTED_CATEGORIES = new Set(["Harry Potter", "The Big Bang Theory"]);
 const BOOSTED_CATEGORY_WEIGHT = 3;
 const CZECH_TEXT_REPLACEMENTS = [
@@ -73,6 +73,8 @@ const CZECH_TEXT_REPLACEMENTS = [
   [/\bSkola\b/g, "Škola"],
   [/\bserie\b/g, "série"],
   [/\bserialu\b/g, "seriálu"],
+  [/\bserial\b/g, "seriál"],
+  [/\bSerial\b/g, "Seriál"],
   [/\bktery\b/g, "který"],
   [/\bKtery\b/g, "Který"],
   [/\bktera\b/g, "která"],
@@ -81,6 +83,8 @@ const CZECH_TEXT_REPLACEMENTS = [
   [/\bKtere\b/g, "Které"],
   [/\bkterou\b/g, "kterou"],
   [/\bnavstevuje\b/g, "navštěvuje"],
+  [/\bbydli\b/g, "bydlí"],
+  [/\bBydli\b/g, "Bydlí"],
   [/\bnejlepsi\b/g, "nejlepší"],
   [/\bkamarad\b/g, "kamarád"],
   [/\bkamaradka\b/g, "kamarádka"],
@@ -100,6 +104,16 @@ const CZECH_TEXT_REPLACEMENTS = [
   [/\bcern[eé]\b/g, "černé"],
   [/\bhlavni\b/g, "hlavní"],
   [/\bzaporak\b/g, "záporák"],
+  [/\bVedkyne\b/g, "Vědkyně"],
+  [/\bvedkyne\b/g, "vědkyně"],
+  [/\bposedla\b/g, "posedlá"],
+  [/\bPosedla\b/g, "Posedlá"],
+  [/\bdeje\b/g, "děje"],
+  [/\bkolegyne\b/g, "kolegyně"],
+  [/\bKolegyne\b/g, "Kolegyně"],
+  [/\bsefova\b/g, "šéfová"],
+  [/\bSefova\b/g, "Šéfová"],
+  [/\bhlavni fyzik\b/g, "hlavní fyzik"],
   [/\bneviditelny plast\b/g, "neviditelný plášť"],
   [/\bneviditelny\b/g, "neviditelný"],
   [/\bzakazany\b/g, "zakázaný"],
@@ -1299,9 +1313,9 @@ $$("[data-go]").forEach(b => b.onclick = () => {
 
 const profileBtn = document.querySelector('#auth-profile-btn');
 if (profileBtn) {
-  profileBtn.onclick = () => {
+  profileBtn.onclick = async () => {
     audio.click();
-    renderProfile();
+    await renderProfile();
   };
 }
 
@@ -1324,6 +1338,30 @@ $("#btn-start-teams").onclick = startTeamsGame;
 
 $("#settings-toggle").onclick = () => $("#settings-panel").classList.toggle("hidden");
 
+function updateSettingsAuthButton() {
+  const settingsLoginBtn = document.querySelector('#btn-settings-google-login');
+  if (!settingsLoginBtn) return;
+
+  const signed = typeof isSignedIn === 'function' && isSignedIn();
+  settingsLoginBtn.textContent = '👤 Můj profil';
+
+  if (signed) {
+    settingsLoginBtn.onclick = async () => {
+      audio.click();
+      $("#settings-panel").classList.add('hidden');
+      await renderProfile();
+    };
+  } else {
+    settingsLoginBtn.onclick = () => {
+      audio.click();
+      $("#settings-panel").classList.add('hidden');
+      if (typeof signInWithGoogle === 'function') {
+        signInWithGoogle();
+      }
+    };
+  }
+}
+
 $("#opt-timer").checked = state.settings.timer;
 $("#opt-count").value = String(state.settings.count);
 
@@ -1342,6 +1380,8 @@ $("#btn-reset-pool").onclick = () => {
   renderHomeStats();
   alert("Paměť otázek vymazána – znovu uvidíš celou banku.");
 };
+
+updateSettingsAuthButton();
 
 // Removed change player UI - button intentionally removed from markup
 
@@ -1373,6 +1413,12 @@ function updateRankedButton() {
     };
   }
 }
+
+const originalUpdateRankedButton = updateRankedButton;
+updateRankedButton = function () {
+  originalUpdateRankedButton();
+  updateSettingsAuthButton();
+};
 
 // Delegated click handler to ensure ranked start works even if handlers
 // were attached before auth state changed or button was re-rendered.
@@ -1406,6 +1452,17 @@ if (typeof sb !== 'undefined' && sb.auth) {
 const isAppRoute = window.location.pathname.includes('/app') || new URLSearchParams(window.location.search).get('view') === 'app';
 if (isAppRoute) {
   document.body.classList.add('app-shell');
+  if (typeof updateAuthUI === 'function') {
+    Promise.resolve().then(async () => {
+      if (typeof getCurrentUser === 'function') {
+        const user = await getCurrentUser();
+        const profile = user && typeof getUserProfile === 'function' ? await getUserProfile(user.id) : null;
+        updateAuthUI(user, profile);
+      } else {
+        updateAuthUI(null, null);
+      }
+    }).catch(() => {});
+  }
   if (typeof hideWelcomeScreen === 'function') {
     hideWelcomeScreen();
   } else {

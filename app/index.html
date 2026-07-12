@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>PopQuiz – kvíz o popkultuře</title>
 
-  <link rel="manifest" href="../manifest.webmanifest?v=20260712-5" />
+  <link rel="manifest" href="../manifest.webmanifest?v=20260712-11" />
   <meta name="theme-color" content="#0f0f1a" />
 
   <meta name="mobile-web-app-capable" content="yes" />
@@ -16,7 +16,7 @@
   <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" href="../icons/icon-192.png" />
 
-  <link rel="stylesheet" href="../styles.css?v=20260712-5" />
+  <link rel="stylesheet" href="../styles.css?v=20260712-11" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -174,6 +174,29 @@
       <button id="btn-clear-leaderboard" class="ghost-btn full">🧹 Vymazat lokální historii</button>
     </section>
 
+    <section id="screen-profile" class="screen">
+      <button class="ghost-btn back" data-go="screen-home" aria-label="Zpět">←</button>
+      <div class="profile-shell">
+        <div class="profile-hero">
+          <div class="profile-avatar" id="profile-avatar">👤</div>
+          <div>
+            <h2 id="profile-name">Profil</h2>
+            <p class="subtitle" id="profile-subtitle">Základní informace o hráči</p>
+          </div>
+        </div>
+
+        <div class="profile-stats" id="profile-stats"></div>
+
+        <div class="profile-history-card">
+          <div class="profile-history-head">
+            <h3>Poslední hry</h3>
+            <span id="profile-history-note">Historie skóre</span>
+          </div>
+          <div id="profile-history" class="profile-history"></div>
+        </div>
+      </div>
+    </section>
+
     <section id="screen-teams-setup" class="screen">
       <button class="ghost-btn back" data-go="screen-home" aria-label="Zpět">←</button>
       <h2>Nastavení týmů</h2>
@@ -250,7 +273,8 @@
           <option>60</option>
         </select>
       </label>
-      <button id="btn-reset-pool" class="ghost-btn">🔄 Reset paměti otázek</button>
+      <button id="btn-reset-pool" class="ghost-btn full">🔄 Obnovit otázky</button>
+      <button id="btn-settings-google-login" class="ghost-btn full">👤 Můj profil</button>
     </div>
   </div>
   <script>
@@ -264,7 +288,7 @@
       }).catch(() => {});
     }
   </script>
-  <script src="../auth.js?v=20260712-5"></script>
-  <script src="../app.js?v=20260712-5"></script>
+  <script src="../auth.js?v=20260712-11"></script>
+  <script src="../app.js?v=20260712-11"></script>
 </body>
 </html>

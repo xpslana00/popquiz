@@ -63,11 +63,27 @@ async function updateProfile(userId, updates) {
 function updateAuthUI(user, profile) {
   currentAuthUser = user;
   currentAuthProfile = profile;
+  const isAppShell = document.body.classList.contains('app-shell');
 
   const banner = document.querySelector('#auth-banner');
   const avatarBtn = document.querySelector('#auth-avatar-btn');
   const loginBtn = document.querySelector('#btn-google-login');
   const avatarEl = document.querySelector('#auth-avatar');
+
+  if (isAppShell) {
+    if (avatarEl) avatarEl.textContent = user && profile && profile.avatar_emoji ? profile.avatar_emoji : '👤';
+    if (avatarBtn) avatarBtn.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (banner) {
+      banner.style.display = 'none';
+      banner.classList.add('auth-hidden');
+    }
+
+    if (typeof updateRankedButton === 'function') {
+      try { updateRankedButton(); } catch (e) { /* ignore */ }
+    }
+    return;
+  }
 
   if (user) {
     let displayName = user.email;
@@ -90,6 +106,8 @@ function updateAuthUI(user, profile) {
       banner.classList.remove('auth-hidden');
     }
   } else {
+    if (avatarEl) avatarEl.textContent = '👤';
+
     if (avatarBtn) avatarBtn.style.display = 'none';
     if (loginBtn) loginBtn.style.display = 'flex';
     if (banner) {

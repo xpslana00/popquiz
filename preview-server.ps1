@@ -48,7 +48,15 @@ while ($listener.IsListening) {
       $context.Response.OutputStream.Write($buffer, 0, $buffer.Length)
     } else {
       $context.Response.StatusCode = 404
-      $buffer = [System.Text.Encoding]::UTF8.GetBytes('Not Found')
+      $fallback404 = [System.IO.Path]::Combine($root, '404.html')
+
+      if ([System.IO.File]::Exists($fallback404)) {
+        $buffer = [System.IO.File]::ReadAllBytes($fallback404)
+        $context.Response.ContentType = 'text/html'
+      } else {
+        $buffer = [System.Text.Encoding]::UTF8.GetBytes('Not Found')
+      }
+
       $context.Response.ContentLength64 = $buffer.Length
       $context.Response.OutputStream.Write($buffer, 0, $buffer.Length)
     }
