@@ -712,8 +712,13 @@ body.app-shell #app {
   height: 24px;
   border-radius: 50%;
   background: rgba(15, 156, 255, 0.12);
-  color: var(--accent);
+  color: #fff;
   font-size: 0.95rem;
+}
+
+/* when the ranked button prompts login, make text white for visibility */
+.need-signin {
+  color: #ffffff !important;
 }
 
 /* ============== WELCOME SCREEN ============== */

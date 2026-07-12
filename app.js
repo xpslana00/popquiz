@@ -1054,9 +1054,11 @@ function updateRankedButton() {
 
   if (signed) {
     btn.innerHTML = '🚀 Zahájit Ranked hru';
+    btn.classList.remove('need-signin');
     btn.onclick = startRankedGame;
   } else {
     btn.innerHTML = '🔐 Přihlas se přes Google pro Ranked';
+    btn.classList.add('need-signin');
     btn.onclick = () => {
       if (typeof signInWithGoogle === 'function') {
         signInWithGoogle();
@@ -1064,6 +1066,20 @@ function updateRankedButton() {
     };
   }
 }
+
+// Delegated click handler to ensure ranked start works even if handlers
+// were attached before auth state changed or button was re-rendered.
+document.addEventListener('click', function (e) {
+  const el = e.target.closest && e.target.closest('#btn-start-ranked');
+  if (!el) return;
+  audio.click();
+  const signed = typeof isSignedIn === 'function' && isSignedIn();
+  if (signed) {
+    if (typeof startRankedGame === 'function') startRankedGame();
+  } else {
+    if (typeof signInWithGoogle === 'function') signInWithGoogle();
+  }
+});
 
 const welcomeEnterBtn = document.querySelector('#btn-welcome-enter');
 if (welcomeEnterBtn) {
