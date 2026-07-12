@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>PopQuiz – kvíz o popkultuře</title>
 
-  <link rel="manifest" href="./manifest.webmanifest?v=20260712-2" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20260712-5" />
   <meta name="theme-color" content="#0f0f1a" />
 
   <meta name="mobile-web-app-capable" content="yes" />
@@ -16,7 +16,7 @@
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" href="./icons/icon-192.png" />
 
-  <link rel="stylesheet" href="./styles.css?v=20260712-2" />
+  <link rel="stylesheet" href="./styles.css?v=20260712-5" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -27,13 +27,12 @@
         <div class="w-hero-grid">
           <div class="w-hero-copy">
             <div class="w-app-brand">
-              <span class="brand-mark">✦</span>
               PopQuiz
             </div>
 
             <div class="w-badge">
               <span class="w-dot"></span>
-              810 otázek · 6 kategorií · Ranked žebříčky
+              1110 otázek · 8 kategorií · Ranked žebříčky
             </div>
 
             <h1 class="w-title">
@@ -53,7 +52,7 @@
             <div class="w-social w-social-strong">
               <span>🚀 20 otázek v Ranked</span>
               <span>☁️ Plná synchronizace</span>
-              <span>🎮 6+ kategorií</span>
+              <span>🎮 8+ kategorií</span>
               <span>⚡ Instantní start</span>
             </div>
 
@@ -191,7 +190,7 @@
         </button>
 
         <button class="mode-card" data-mode="custom">
-          <span class="emoji">🎨</span>
+          <span class="emoji">🛠️</span>
           <h2>Vlastní hra</h2>
           <p>Vyber kategorie, obtížnost, počet otázek a časovač</p>
         </button>
@@ -219,7 +218,7 @@
 
     <section id="screen-custom-setup" class="screen">
       <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
-      <h2>🎨 Vlastní hra</h2>
+      <h2>🛠️ Vlastní hra</h2>
       <p class="subtitle">Nastav si kvíz přesně podle sebe</p>
 
       <div class="custom-section">
@@ -231,12 +230,14 @@
           <button class="chip" data-cat="Hry">🎮 Hry</button>
           <button class="chip" data-cat="Anime">🌸 Anime</button>
           <button class="chip" data-cat="Knihy">📚 Knihy</button>
+          <button class="chip" data-cat="Harry Potter">⚡ Harry Potter</button>
+          <button class="chip" data-cat="The Big Bang Theory">🛋️ The Big Bang Theory</button>
         </div>
         <p class="hint-text-small">Když nevybereš nic, použijí se všechny kategorie.</p>
       </div>
 
       <div class="custom-section">
-        <h3>⚡ Obtížnost</h3>
+        <h3>🎚️ Obtížnost</h3>
         <div class="chip-group" id="custom-difficulties">
           <button class="chip" data-diff="easy">● Lehká</button>
           <button class="chip" data-diff="medium">●● Střední</button>
@@ -402,7 +403,7 @@
       }).catch(() => {});
     }
   </script>
-  <script src="./auth.js?v=20260712-2"></script>
-  <script src="./app.js?v=20260712-2"></script>
+  <script src="./auth.js?v=20260712-5"></script>
+  <script src="./app.js?v=20260712-5"></script>
 </body>
 </html>

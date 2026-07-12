@@ -54,6 +54,135 @@ const state = {
 
 const TEAM_COLORS = ["#7c5cff", "#22c55e", "#f59e0b", "#3b82f6", "#ec4899", "#06b6d4"];
 const TEAM_NAMES_DEFAULT = ["Fialoví", "Zelení", "Oranžoví", "Modří", "Růžoví", "Tyrkysoví"];
+const DATASET_VERSION = "20260712-5";
+const BOOSTED_CATEGORIES = new Set(["Harry Potter", "The Big Bang Theory"]);
+const BOOSTED_CATEGORY_WEIGHT = 3;
+const CZECH_TEXT_REPLACEMENTS = [
+  [/\bPatri\b/g, "Patří"],
+  [/\bpatri\b/g, "patří"],
+  [/\bzakladni\b/g, "základní"],
+  [/\bZakladni\b/g, "Základní"],
+  [/\bfanousky\b/g, "fanoušky"],
+  [/\bferovy\b/g, "férový"],
+  [/\btezsi\b/g, "těžší"],
+  [/\btezsi\b/g, "těžší"],
+  [/\bToto je tezsi\b/g, "Toto je těžší"],
+  [/Tema:/g, "Téma:"],
+  [/Spravna odpoved zacina na:/g, "Správná odpověď začíná na:"],
+  [/\bskola\b/g, "škola"],
+  [/\bSkola\b/g, "Škola"],
+  [/\bserie\b/g, "série"],
+  [/\bserialu\b/g, "seriálu"],
+  [/\bktery\b/g, "který"],
+  [/\bKtery\b/g, "Který"],
+  [/\bktera\b/g, "která"],
+  [/\bKtera\b/g, "Která"],
+  [/\bktere\b/g, "které"],
+  [/\bKtere\b/g, "Které"],
+  [/\bkterou\b/g, "kterou"],
+  [/\bnavstevuje\b/g, "navštěvuje"],
+  [/\bnejlepsi\b/g, "nejlepší"],
+  [/\bkamarad\b/g, "kamarád"],
+  [/\bkamaradka\b/g, "kamarádka"],
+  [/\bvetsi\b/g, "větší"],
+  [/\bcasti\b/g, "části"],
+  [/\bcast\b/g, "část"],
+  [/\breditel\b/g, "ředitel"],
+  [/\breditelka\b/g, "ředitelka"],
+  [/\bkoleje\b/g, "koleje"],
+  [/\bpatri\b/g, "patří"],
+  [/\bucitelkou\b/g, "učitelkou"],
+  [/\bucitelka\b/g, "učitelka"],
+  [/\bucitel\b/g, "učitel"],
+  [/\bucitelkou\b/g, "učitelkou"],
+  [/\bpromenovani\b/g, "přeměňování"],
+  [/\blektvaru\b/g, "lektvarů"],
+  [/\bcern[eé]\b/g, "černé"],
+  [/\bhlavni\b/g, "hlavní"],
+  [/\bzaporak\b/g, "záporák"],
+  [/\bneviditelny plast\b/g, "neviditelný plášť"],
+  [/\bneviditelny\b/g, "neviditelný"],
+  [/\bzakazany\b/g, "zakázaný"],
+  [/\bprisera\b/g, "příšera"],
+  [/\botevre\b/g, "otevře"],
+  [/\bdomaci skritek\b/g, "domácí skřítek"],
+  [/\btretim\b/g, "třetím"],
+  [/\bzachrani\b/g, "zachrání"],
+  [/\bukazujici\b/g, "ukazující"],
+  [/\bpredmet\b/g, "předmět"],
+  [/\bprvni\b/g, "první"],
+  [/\bdruhem\b/g, "druhém"],
+  [/\bctvrtem\b/g, "čtvrtém"],
+  [/\bpatem\b/g, "pátém"],
+  [/\bsestem\b/g, "šestém"],
+  [/\bsedmem\b/g, "sedmém"],
+  [/\bmadarsky\b/g, "maďarský"],
+  [/\bkouzelnicky\b/g, "kouzelnický"],
+  [/\bkouzelnicka\b/g, "kouzelnická"],
+  [/\bkouzelnicke\b/g, "kouzelnické"],
+  [/\btajna\b/g, "tajná"],
+  [/\bspolecnost\b/g, "společnost"],
+  [/\bfenixuv rad\b/g, "Fénixův řád"],
+  [/\bBrumbal\b/g, "Brumbál"],
+  [/\bBrumbalova\b/g, "Brumbálova"],
+  [/\bNebelvir\b/g, "Nebelvír"],
+  [/\bHavraspar\b/g, "Havraspár"],
+  [/\bMadarsky\b/g, "Maďarský"],
+  [/\bMadarska\b/g, "Maďarská"],
+  [/\bKlofak\b/g, "Klofák"],
+  [/\bCamral\b/g, "Camrál"],
+  [/\bFamfrpal\b/g, "Famfrpál"],
+  [/\bZlatonka\b/g, "Zlatonka"],
+  [/\bPrasinky\b/g, "Prasinky"],
+  [/\bPricna\b/g, "Příčná"],
+  [/\bzvire\b/g, "zvíře"],
+  [/\bbydli\b/g, "bydlí"],
+  [/\bprijmeni\b/g, "příjmení"],
+  [/\binzenyr\b/g, "inženýr"],
+  [/\bpozd[eě]jsi\b/g, "pozdější"],
+  [/\bpartnerka\b/g, "partnerka"],
+  [/\bmanzelka\b/g, "manželka"],
+  [/\bservirka\b/g, "servírka"],
+  [/\bvedeckyne\b/g, "vědkyně"],
+  [/\bdoktorat\b/g, "doktorát"],
+  [/\boblibene\b/g, "oblíbené"],
+  [/\boblibeny\b/g, "oblíbený"],
+  [/\bmesto\b/g, "město"],
+  [/\bbivaly\b/g, "bývalý"],
+  [/\bvesmirna\b/g, "vesmírná"],
+  [/\bpovedeny\b/g, "povedený"],
+  [/\bctvrtek\b/g, "čtvrtek"],
+  [/\bvazny\b/g, "vážný"],
+  [/\bvetsina\b/g, "většina"],
+  [/\bgeolozka\b/g, "geoložka"],
+  [/\bneurobiolozka\b/g, "neurobioložka"],
+  [/\bastrofyzik\b/g, "astrofyzik"],
+  [/\bkomiksovy\b/g, "komiksový"],
+  [/\bvedecky\b/g, "vědecký"],
+  [/\bsvatbe\b/g, "svatbě"],
+  [/\bmyslence\b/g, "myšlence"],
+  [/\bsvatbu\b/g, "svatbu"],
+  [/\bdetsky\b/g, "dětský"],
+  [/\bgeneralni\b/g, "generální"],
+  [/\bzisk[aá]\b/g, "získá"],
+  [/\bvede\b/g, "vede"],
+  [/\bvedecky idol\b/g, "vědecký idol"],
+  [/\brandi?t\b/g, "randit"],
+  [/\bprednasek\b/g, "přednášek"],
+  [/\bzabavny\b/g, "zábavný"],
+  [/\bkamaradkou\b/g, "kamarádkou"],
+  [/\bkolegkyne\b/g, "kolegyně"],
+  [/\bboji\b/g, "bojí"],
+  [/\bmeste\b/g, "městě"],
+  [/\bnejvetsi\b/g, "největší"],
+  [/\bzdr[ao]tni\b/g, "zdravotní"],
+  [/\bdrobnosti\b/g, "drobnosti"],
+  [/\bnemoci\b/g, "nemoci"],
+  [/\bpratele\b/g, "přátele"],
+  [/\bteoreticky\b/g, "teoretický"],
+  [/\bspolecna\b/g, "společná"],
+  [/\bvecere\b/g, "večeře"]
+];
 
 /* ============== CUSTOM MODE CONFIG ============== */
 const customConfig = {
@@ -398,16 +527,68 @@ const audio = (() => ({
 
 /* ============== NAČTENÍ OTÁZEK + RANDOMIZER ============== */
 async function loadAllQuestions() {
-  const r = await fetch("/data/questions.json");
-  return await r.json();
+  const [r, hpModule, bbtModule] = await Promise.all([
+    fetch('/data/questions.json?v=' + DATASET_VERSION),
+    import('/data/questions_harry_potter.js?v=' + DATASET_VERSION),
+    import('/data/questions_big_bang_theory.js?v=' + DATASET_VERSION)
+  ]);
+
+  const baseQuestions = await r.json();
+
+  return [
+    ...baseQuestions,
+    ...normalizeQuestionSet(hpModule.harryPotterQuestions),
+    ...normalizeQuestionSet(bbtModule.bigBangTheoryQuestions)
+  ];
+}
+
+function normalizeCzechText(value) {
+  let result = String(value);
+
+  CZECH_TEXT_REPLACEMENTS.forEach(([pattern, replacement]) => {
+    result = result.replace(pattern, replacement);
+  });
+
+  return result;
+}
+
+function normalizeQuestionSet(questions) {
+  return questions.map((question) => ({
+    ...question,
+    question: normalizeCzechText(question.question),
+    answers: question.answers.map(normalizeCzechText),
+    hints: question.hints.map(normalizeCzechText)
+  }));
+}
+
+function buildCategoryCycle(byCategory, prioritizeBoostedCategories) {
+  const categories = shuffle(Object.keys(byCategory));
+
+  if (!prioritizeBoostedCategories) {
+    return categories;
+  }
+
+  const weighted = [];
+
+  categories.forEach(cat => {
+    const weight = BOOSTED_CATEGORIES.has(cat) ? BOOSTED_CATEGORY_WEIGHT : 1;
+
+    for (let i = 0; i < weight; i++) {
+      weighted.push(cat);
+    }
+  });
+
+  return shuffle(weighted);
 }
 
 function pickRunQuestions(all, count, filter = {}) {
-  const seen = loadSeen();
+  const ignoreSeen = !!filter.ignoreSeen;
+  const seen = ignoreSeen ? new Set() : loadSeen();
 
   let pool = [...all];
+  const hasExplicitCategoryFilter = !!(filter.categories && filter.categories.length > 0);
 
-  if (filter.categories && filter.categories.length > 0) {
+  if (hasExplicitCategoryFilter) {
     pool = pool.filter(q => filter.categories.includes(q.category));
   }
 
@@ -423,7 +604,11 @@ function pickRunQuestions(all, count, filter = {}) {
 
   if (unseen.length < count) {
     pool.forEach(q => seen.delete(q.id));
-    saveSeen(seen);
+
+    if (!ignoreSeen) {
+      saveSeen(seen);
+    }
+
     unseen = [...pool];
   }
 
@@ -439,7 +624,7 @@ function pickRunQuestions(all, count, filter = {}) {
   });
 
   const picked = [];
-  const categories = shuffle(Object.keys(byCategory));
+  const categories = buildCategoryCycle(byCategory, !hasExplicitCategoryFilter);
   let safety = 0;
 
   while (picked.length < count && safety < 10000) {
@@ -460,8 +645,10 @@ function pickRunQuestions(all, count, filter = {}) {
 
   const final = shuffle(picked).slice(0, count);
 
-  final.forEach(q => seen.add(q.id));
-  saveSeen(seen);
+  if (!ignoreSeen) {
+    final.forEach(q => seen.add(q.id));
+    saveSeen(seen);
+  }
 
   return final;
 }
@@ -555,7 +742,7 @@ async function startRankedGame() {
 
   const all = await loadAllQuestions();
 
-  state.questions = shuffle(all).slice(0, RANKED_CONFIG.count);
+  state.questions = pickRunQuestions(all, RANKED_CONFIG.count, { ignoreSeen: true });
   state.total = state.questions.length;
 
   if (state.questions.length < RANKED_CONFIG.count) {

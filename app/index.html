@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>PopQuiz – kvíz o popkultuře</title>
 
-  <link rel="manifest" href="../manifest.webmanifest?v=20260712-2" />
+  <link rel="manifest" href="../manifest.webmanifest?v=20260712-5" />
   <meta name="theme-color" content="#0f0f1a" />
 
   <meta name="mobile-web-app-capable" content="yes" />
@@ -16,13 +16,12 @@
   <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" href="../icons/icon-192.png" />
 
-  <link rel="stylesheet" href="../styles.css?v=20260712-2" />
+  <link rel="stylesheet" href="../styles.css?v=20260712-5" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div id="app">
     <section id="screen-home" class="screen">
-      <a href="../" class="ghost-btn back app-top-banner" aria-label="Zpět"><span class="app-top-logo">←</span></a>
       <div id="auth-banner" class="auth-banner">
         <div id="auth-avatar-btn" class="auth-avatar-btn" style="display:none;">
           <button id="auth-profile-btn" class="profile-btn" aria-label="Profil"><span id="auth-avatar" class="auth-avatar">👤</span></button>
@@ -39,10 +38,10 @@
         </button>
       </div>
 
-      <div class="hero">
+      <a href="../" class="hero hero-home-link" aria-label="Přejít na hlavní stránku PopQuiz">
         <h1>🎬 PopQuiz</h1>
         <p class="subtitle">Filmy · hudba · seriály · hry · anime · knihy</p>
-      </div>
+      </a>
 
       <div class="mode-cards">
         <button class="mode-card mode-card-featured" data-mode="ranked">
@@ -70,7 +69,7 @@
         </button>
 
         <button class="mode-card" data-mode="custom">
-          <span class="emoji">🎨</span>
+          <span class="emoji">🛠️</span>
           <h2>Vlastní hra</h2>
           <p>Vyber kategorie, obtížnost, počet otázek a časovač</p>
         </button>
@@ -86,7 +85,7 @@
     </section>
 
     <section id="screen-ranked-info" class="screen">
-      <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
+      <button class="ghost-btn back" data-go="screen-home" aria-label="Zpět">←</button>
       <div class="ranked-info">
         <h2>🏆 Ranked hra</h2>
         <p class="subtitle">Férová hodnocená hra pro žebříček</p>
@@ -103,8 +102,8 @@
     </section>
 
     <section id="screen-custom-setup" class="screen">
-      <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
-      <h2>🎨 Vlastní hra</h2>
+      <button class="ghost-btn back" data-go="screen-home" aria-label="Zpět">←</button>
+      <h2>🛠️ Vlastní hra</h2>
       <p class="subtitle">Nastav si kvíz přesně podle sebe</p>
 
       <div class="custom-section">
@@ -116,12 +115,14 @@
           <button class="chip" data-cat="Hry">🎮 Hry</button>
           <button class="chip" data-cat="Anime">🌸 Anime</button>
           <button class="chip" data-cat="Knihy">📚 Knihy</button>
+          <button class="chip" data-cat="Harry Potter">⚡ Harry Potter</button>
+          <button class="chip" data-cat="The Big Bang Theory">🛋️ The Big Bang Theory</button>
         </div>
         <p class="hint-text-small">Když nevybereš nic, použijí se všechny kategorie.</p>
       </div>
 
       <div class="custom-section">
-        <h3>⚡ Obtížnost</h3>
+        <h3>🎚️ Obtížnost</h3>
         <div class="chip-group" id="custom-difficulties">
           <button class="chip" data-diff="easy">● Lehká</button>
           <button class="chip" data-diff="medium">●● Střední</button>
@@ -166,7 +167,7 @@
     </section>
 
     <section id="screen-leaderboard" class="screen">
-      <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
+      <button class="ghost-btn back" data-go="screen-home" aria-label="Zpět">←</button>
       <h2>🏆 Žebříček</h2>
       <p class="subtitle">Lokální historie skóre na tomto zařízení</p>
       <div id="leaderboard-list" class="leaderboard-list"></div>
@@ -174,7 +175,7 @@
     </section>
 
     <section id="screen-teams-setup" class="screen">
-      <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
+      <button class="ghost-btn back" data-go="screen-home" aria-label="Zpět">←</button>
       <h2>Nastavení týmů</h2>
       <p class="subtitle">Přidej 2–6 týmů a pojmenuj je</p>
       <div id="teams-editor" class="teams-editor"></div>
@@ -263,7 +264,7 @@
       }).catch(() => {});
     }
   </script>
-  <script src="../auth.js?v=20260712-2"></script>
-  <script src="../app.js?v=20260712-2"></script>
+  <script src="../auth.js?v=20260712-5"></script>
+  <script src="../app.js?v=20260712-5"></script>
 </body>
 </html>

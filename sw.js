@@ -1,5 +1,5 @@
 /* ============== POPQUIZ SERVICE WORKER ============== */
-const CACHE = "popquiz-v19";
+const CACHE = "popquiz-v22";
 
 // Soubory, které se uloží do cache při instalaci
 const ASSETS = [
@@ -10,6 +10,8 @@ const ASSETS = [
   "./auth.js",
   "./manifest.webmanifest",
   "./data/questions.json",
+  "./data/questions_harry_potter.js",
+  "./data/questions_big_bang_theory.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png"
