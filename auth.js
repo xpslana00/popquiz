@@ -254,13 +254,11 @@ function hideWelcomeScreen() {
 }
 
 function shouldShowWelcome() {
-  if (typeof isSignedIn === 'function' && isSignedIn()) return false;
-  return localStorage.getItem(WELCOME_KEY) !== '1';
+  return true;
 }
 
 function wireWelcomeButtons() {
   const googleBtn = document.querySelector('#btn-welcome-google');
-  const skipBtn = document.querySelector('#btn-welcome-skip');
 
   if (googleBtn) {
     googleBtn.onclick = function () {
@@ -269,30 +267,35 @@ function wireWelcomeButtons() {
       }
     };
   }
-
-  if (skipBtn) {
-    skipBtn.onclick = hideWelcomeScreen;
-  }
 }
 
 function initWelcomeScreen() {
   wireWelcomeButtons();
-  
+
   document.querySelectorAll('.screen').forEach(function(s) {
     s.classList.remove('active');
     s.setAttribute('style', 'display: none !important;');
   });
-  
+
+  const welcome = document.querySelector('#screen-welcome');
+  const home = document.querySelector('#screen-home');
+
+  if (!welcome) {
+    if (home) {
+      home.classList.add('active');
+      home.setAttribute('style', 'display: block !important;');
+    }
+    return;
+  }
+
   if (shouldShowWelcome()) {
     setTimeout(function() {
-      const welcome = document.querySelector('#screen-welcome');
       if (welcome) {
         welcome.classList.add('active');
         welcome.setAttribute('style', 'display: block !important;');
       }
     }, 100);
   } else {
-    const home = document.querySelector('#screen-home');
     if (home) {
       home.classList.add('active');
       home.setAttribute('style', 'display: block !important;');

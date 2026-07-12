@@ -24,7 +24,6 @@ const STORAGE = {
 };
 
 const defaultSettings = {
-  sound: true,
   timer: true,
   count: 30,
   timerSec: 15
@@ -124,36 +123,15 @@ function setPlayerName(name) {
   localStorage.setItem(STORAGE.playerName, name);
 }
 
-function ensurePlayerName() {
-  let name = getPlayerName();
-
-  if (!name) {
-    const input = prompt("Jak ti říkáme? Zadej prosím přezdívku pro hru a lokální žebříček.", "");
-    if (input === null) return "";
-    name = input.trim();
-    if (!name) return "";
-    setPlayerName(name);
-  }
-
-  return name;
-}
-
-function requirePlayerNameForGuest() {
-  if (typeof isSignedIn === 'function' && isSignedIn()) {
-    return true;
-  }
-
-  const name = ensurePlayerName();
-  if (!name) {
-    alert("Pro hraní bez přihlášení zadej prosím přezdívku.");
-    return false;
-  }
-
-  return true;
+function getSavedPlayerName() {
+  const stored = getPlayerName();
+  if (stored) return stored;
+  if (typeof isSignedIn === 'function' && isSignedIn()) return getDisplayName();
+  return "Host";
 }
 
 function shouldRequirePlayerName(mode) {
-  return mode === 'solo';
+  return mode === 'ranked';
 }
 
 function changePlayerName() {
@@ -180,7 +158,7 @@ function saveScoreHistory(history) {
 }
 
 function addScoreToHistory(score) {
-  const name = ensurePlayerName();
+  const name = getSavedPlayerName();
   const history = loadScoreHistory();
 
   history.push({
@@ -294,7 +272,7 @@ const audio = (() => ({
 
 /* ============== NAČTENÍ OTÁZEK + RANDOMIZER ============== */
 async function loadAllQuestions() {
-  const r = await fetch("./data/questions.json");
+  const r = await fetch("/data/questions.json");
   return await r.json();
 }
 
@@ -375,17 +353,11 @@ async function startGame(mode) {
     return;
   }
 
-  if (shouldRequirePlayerName(mode) && !requirePlayerNameForGuest()) return;
-
   state.mode = mode;
   state.index = 0;
   state.score = 0;
   state.streak = 0;
   state.total = state.settings.count;
-
-  if (mode === "solo") {
-    ensurePlayerName();
-  }
 
   if (mode === "teams") {
     showScreen("screen-teams-setup");
@@ -985,20 +957,24 @@ function updateStats(score) {
 function renderHomeStats() {
   const s = JSON.parse(localStorage.getItem(STORAGE.stats) || "{}");
   const seenCount = loadSeen().size;
-  let player = "bez jména";
-  if (typeof isSignedIn === 'function' && isSignedIn() && typeof getDisplayName === 'function') {
-    player = getDisplayName();
-  } else {
-    player = getPlayerName() || "bez jména";
-  }
+  const footerStats = $("#footer-stats");
+  if (!footerStats) return;
 
-  $("#footer-stats").innerHTML = s.gamesPlayed
-    ? 'Hráč: <b>' + escapeHtml(player) + '</b> · Odehráno: <b>' + s.gamesPlayed + '</b> · Nejlepší skóre: <b>' + s.bestScore + '</b> · Viděno otázek: <b>' + seenCount + '</b>'
-    : 'Hráč: <b>' + escapeHtml(player) + '</b> · Zatím jsi nehrál. Pusť se do toho! 🚀';
+  const signedIn = typeof isSignedIn === 'function' && isSignedIn();
+  if (signedIn) {
+    const player = typeof getDisplayName === 'function' ? getDisplayName() : "Hráč";
+    footerStats.innerHTML = s.gamesPlayed
+      ? 'Hráč: <b>' + escapeHtml(player) + '</b> · Odehráno: <b>' + s.gamesPlayed + '</b> · Nejlepší skóre: <b>' + s.bestScore + '</b> · Viděno otázek: <b>' + seenCount + '</b>'
+      : 'Hráč: <b>' + escapeHtml(player) + '</b> · Zatím jsi nehrál. Pusť se do toho! 🚀';
+  } else {
+    footerStats.innerHTML = s.gamesPlayed
+      ? 'Vybral jsi už pár her. Pokračuj ve Solo režimu nebo se přihlas pro Ranked.'
+      : 'Žádná historie není. Vyber režim nahoře a pusť se rovnou do hry.';
+  }
 
   const changePlayerBtn = document.querySelector('#btn-change-player');
   if (changePlayerBtn) {
-    changePlayerBtn.style.display = 'none';
+    changePlayerBtn.style.display = signedIn ? '' : 'none';
   }
 }
 
@@ -1033,14 +1009,8 @@ $("#btn-start-teams").onclick = startTeamsGame;
 
 $("#settings-toggle").onclick = () => $("#settings-panel").classList.toggle("hidden");
 
-$("#opt-sound").checked = state.settings.sound;
 $("#opt-timer").checked = state.settings.timer;
 $("#opt-count").value = String(state.settings.count);
-
-$("#opt-sound").onchange = (e) => {
-  state.settings.sound = e.target.checked;
-  saveSettings();
-};
 
 $("#opt-timer").onchange = (e) => {
   state.settings.timer = e.target.checked;
@@ -1095,13 +1065,6 @@ function updateRankedButton() {
   }
 }
 
-const welcomePlayBtn = document.querySelector('#btn-welcome-play');
-if (welcomePlayBtn) {
-  welcomePlayBtn.onclick = () => {
-    window.location.href = './app/';
-  };
-}
-
 const welcomeEnterBtn = document.querySelector('#btn-welcome-enter');
 if (welcomeEnterBtn) {
   welcomeEnterBtn.onclick = () => {
@@ -1126,7 +1089,7 @@ if (isAppRoute) {
     showScreen('screen-home');
   }
 } else {
-  renderHomeStats();
+  showWelcomeScreen();
 }
 
 /* ============== REGISTRACE SERVICE WORKERU ============== */
