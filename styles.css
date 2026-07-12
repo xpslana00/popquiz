@@ -330,7 +330,7 @@ body.app-shell #app {
 }
 .primary-btn {
   background: linear-gradient(135deg, rgba(15, 156, 255, 0.14), rgba(0, 255, 209, 0.12));
-  color: #08131f; border: 0; flex: 1;
+  color: #ffffff; border: 0; flex: 1;
   box-shadow: 0 14px 34px rgba(109, 74, 255, 0.22);
 }
 .ghost-btn {
