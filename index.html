@@ -23,81 +23,124 @@
   <div id="app">
 
     <section id="screen-welcome" class="screen">
-      <div class="w-wrap">
+      <div class="w-shell">
+        <div class="w-hero-grid">
+          <div class="w-hero-copy">
+            <div class="w-app-brand">
+              <span class="brand-mark">✦</span>
+              PopQuiz
+            </div>
 
-        <div class="w-hero">
-          <div class="w-app-brand" style="opacity: 0.7; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; color: #8b5cf6;">PopQuiz</div>
-          
-          <div class="w-badge">
-            <span class="w-dot"></span>
-            810 otázek · 6 kategorií
+            <div class="w-badge">
+              <span class="w-dot"></span>
+              810 otázek · 6 kategorií · Ranked žebříčky
+            </div>
+
+            <h1 class="w-title">
+              Otestuj svoje znalosti z
+              <span class="w-grad">popkultury</span>
+            </h1>
+
+            <p class="w-tag">
+              Rychlé kvízy o filmech, seriálech, hudbě, hrách, anime a knihách — s moderním bodováním,
+              bonusy a cloud synchronizací, které zvednou každou hru na další úroveň.
+            </p>
+
+            <div class="w-actions">
+              <button id="btn-welcome-play" class="w-primary">▶ Hrát hned</button>
+              <button id="btn-welcome-google" class="w-google">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Přihlásit se přes Google
+              </button>
+              <button id="btn-welcome-skip" class="w-skip">Hrát bez přihlášení</button>
+            </div>
+
+            <div class="w-social">
+              <span>⚡ 20 otázek v Ranked</span>
+              <span>☁️ Cloud sync</span>
+              <span>🎮 6+ kategorií</span>
+            </div>
           </div>
-          <h1 class="w-title">
-            Testuj svoje<br>
-            <span class="w-grad">popkulturní</span> znalosti
-          </h1>
-          <p class="w-tag">Rychlý kvíz o filmech, seriálech, hudbě, hrách, anime a knihách.</p>
-        </div>
 
-        <div class="w-preview">
-          <div class="iphone">
-            <div class="iphone-island"></div>
-            <div class="iphone-screen">
-              <div class="ip-top">
-                <div class="ip-time">9:41</div>
-                <div class="ip-status">
-                  <span>􀋙</span>
-                  <span>􀎡</span>
-                  <span>􀛨</span>
+          <div class="w-preview-shell">
+            <div class="w-glow glow-one"></div>
+            <div class="w-glow glow-two"></div>
+            <div class="iphone">
+              <div class="iphone-island"></div>
+              <div class="iphone-screen">
+                <div class="ip-top">
+                  <div class="ip-time">9:41</div>
+                  <div class="ip-status">
+                    <span>􀋙</span>
+                    <span>􀎡</span>
+                    <span>􀛨</span>
+                  </div>
                 </div>
-              </div>
-              <div class="ip-header">
-                <div class="ip-progress">
-                  <div class="ip-progress-bar"></div>
+                <div class="ip-header">
+                  <div class="ip-progress">
+                    <div class="ip-progress-bar"></div>
+                  </div>
+                  <div class="ip-timer">⏱ 12s</div>
+                  <div class="ip-score">2140</div>
                 </div>
-                <div class="ip-timer">⏱ 12s</div>
-                <div class="ip-score">2140</div>
-              </div>
-              <div class="ip-chip">🎬 Film · ●● Střední</div>
-              <div class="ip-question">Kdo hraje Iron Mana v MCU?</div>
-              <div class="ip-answers">
-                <div class="ip-answer">Chris Evans</div>
-                <div class="ip-answer ip-correct">Robert Downey Jr. ✓</div>
-                <div class="ip-answer">Chris Hemsworth</div>
-                <div class="ip-answer">Mark Ruffalo</div>
+                <div class="ip-chip">🎬 Film · ●● Střední</div>
+                <div class="ip-question">Kdo hraje Iron Mana v MCU?</div>
+                <div class="ip-answers">
+                  <div class="ip-answer">Chris Evans</div>
+                  <div class="ip-answer ip-correct">Robert Downey Jr. ✓</div>
+                  <div class="ip-answer">Chris Hemsworth</div>
+                  <div class="ip-answer">Mark Ruffalo</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="w-features">
-          <div class="w-feat">
-            <span class="w-feat-ico">🏆</span>
-            <span class="w-feat-txt">Ranked hry</span>
+        <section class="w-feature-section">
+          <div class="w-feature-grid">
+            <article class="w-feature-card">
+              <div class="w-feature-icon">🏆</div>
+              <h3>Ranked hry</h3>
+              <p>Férové bodování, bonusy a žebříčky, které dávají každé hře ještě větší smysl.</p>
+            </article>
+            <article class="w-feature-card">
+              <div class="w-feature-icon">☁️</div>
+              <h3>Cloud sync</h3>
+              <p>Uložený postup a přístup k žebříčku bez ohledu na zařízení, které používáš.</p>
+            </article>
+            <article class="w-feature-card">
+              <div class="w-feature-icon">🎯</div>
+              <h3>6+ kategorií</h3>
+              <p>Filmy, seriály, hudba, hry, anime i knihy v jednom moderním kvízu.</p>
+            </article>
+            <article class="w-feature-card">
+              <div class="w-feature-icon">💡</div>
+              <h3>Stovky otázek</h3>
+              <p>Neustále rozšiřovaná databáze a různé režimy hry pro každou náladu.</p>
+            </article>
           </div>
-          <div class="w-feat">
-            <span class="w-feat-ico">☁️</span>
-            <span class="w-feat-txt">Cloud sync</span>
-          </div>
-          <div class="w-feat">
-            <span class="w-feat-ico">🌍</span>
-            <span class="w-feat-txt">Žebříček</span>
-          </div>
-        </div>
+        </section>
 
-        <div class="w-actions">
-          <button id="btn-welcome-google" class="w-google">
-            <svg width="18" height="18" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Přihlásit se přes Google
-          </button>
-          <button id="btn-welcome-skip" class="w-skip">Hrát bez přihlášení →</button>
-        </div>
+        <section class="w-cta-card">
+          <div>
+            <p class="w-cta-kicker">Připravený na mobil i desktop</p>
+            <h3>Začni hned a vyzkoušej si moderní kvízovou show v popkultuře.</h3>
+          </div>
+          <button class="w-primary" id="btn-welcome-enter">Vstoupit do kvízu</button>
+        </section>
 
+        <footer class="w-footer">
+          <span>© 2026 PopQuiz</span>
+          <div class="w-footer-links">
+            <a href="./terms.html">Podmínky</a>
+            <a href="./privacy.html">Ochrana soukromí</a>
+          </div>
+        </footer>
       </div>
     </section>
     

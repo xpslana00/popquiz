@@ -227,12 +227,14 @@ async function renderLeaderboard() {
       const avatar = profile.avatar_emoji || '🎮';
       const isMe = currentUserId && r.user_id === currentUserId;
       const highlight = isMe ? ' leaderboard-me' : '';
+      const gamesCount = r.games_count || 1;
+      const gamesLabel = gamesCount === 1 ? 'odehraná hra' : gamesCount < 5 ? 'odehrané hry' : 'odehraných her';
 
       return '<div class="leaderboard-item' + highlight + '">' +
         '<div class="leaderboard-rank">#' + (i + 1) + '</div>' +
         '<div>' +
           '<div class="leaderboard-name">' + avatar + ' ' + escapeHtml(name) + (isMe ? ' <span style="color:#ffd700">(Ty)</span>' : '') + '</div>' +
-          '<div class="leaderboard-meta">' + formatDateTime(r.created_at) + ' · ' + (r.total_questions || 20) + ' otazek · 🏆 Ranked</div>' +
+          '<div class="leaderboard-meta">' + formatDateTime(r.created_at) + ' · ' + (r.total_questions || 20) + ' otazek · 🏆 Ranked · ' + gamesCount + ' ' + gamesLabel + '</div>' +
         '</div>' +
         '<div class="leaderboard-score">' + r.score + '</div>' +
       '</div>';
@@ -1089,6 +1091,24 @@ function updateRankedButton() {
       }
     };
   }
+}
+
+const welcomePlayBtn = document.querySelector('#btn-welcome-play');
+if (welcomePlayBtn) {
+  welcomePlayBtn.onclick = () => {
+    if (typeof hideWelcomeScreen === 'function') {
+      hideWelcomeScreen();
+    }
+  };
+}
+
+const welcomeEnterBtn = document.querySelector('#btn-welcome-enter');
+if (welcomeEnterBtn) {
+  welcomeEnterBtn.onclick = () => {
+    if (typeof hideWelcomeScreen === 'function') {
+      hideWelcomeScreen();
+    }
+  };
 }
 
 updateRankedButton();

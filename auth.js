@@ -175,18 +175,41 @@ async function saveScoreToCloud(scoreData) {
 }
 
 async function getGlobalLeaderboard(limit) {
-  const max = limit || 100;
+  const max = Math.max(limit || 100, 1);
   const result = await sb
     .from('scores')
-    .select('id, score, mode, total_questions, correct_answers, created_at, profiles(username, avatar_emoji, email)')
+    .select('id, user_id, score, mode, total_questions, correct_answers, created_at, profiles(username, avatar_emoji, email)')
     .eq('mode', 'ranked')
     .order('score', { ascending: false })
-    .limit(max);
+    .limit(Math.max(max * 5, 100));
+
   if (result.error) {
     console.error('Leaderboard fetch error:', result.error);
     return [];
   }
-  return result.data || [];
+
+  const rows = result.data || [];
+  const bestByUser = new Map();
+  const gamesCountByUser = new Map();
+
+  rows.forEach((row) => {
+    const key = row.user_id || (row.profiles && (row.profiles.username || row.profiles.email)) || `row-${row.id}`;
+    const existingCount = gamesCountByUser.get(key) || 0;
+    gamesCountByUser.set(key, existingCount + 1);
+
+    const existing = bestByUser.get(key);
+    if (!existing || row.score > existing.score) {
+      bestByUser.set(key, row);
+    }
+  });
+
+  return [...bestByUser.entries()]
+    .map(([key, row]) => ({
+      ...row,
+      games_count: gamesCountByUser.get(key) || 1
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, max);
 }
 
 async function getMyRankedHistory(limit) {
