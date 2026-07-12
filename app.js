@@ -134,6 +134,21 @@ function shouldRequirePlayerName(mode) {
   return mode === 'ranked';
 }
 
+// Previously the code expected a helper to require a player name for guests.
+// We no longer force entering a nickname — allow signed users to play Ranked
+// and allow guests to start without an extra prompt.
+function requirePlayerNameForGuest() {
+  return true;
+}
+
+function ensurePlayerName() {
+  const current = getPlayerName();
+  if (!current || current.trim() === "") {
+    const fallback = (typeof isSignedIn === 'function' && isSignedIn()) ? getDisplayName() : 'Host';
+    setPlayerName(fallback);
+  }
+}
+
 function changePlayerName() {
   const current = getPlayerName() || "Hráč";
   const next = prompt("Zadej nové jméno hráče:", current);
@@ -410,8 +425,6 @@ async function startTeamsGame() {
 
 /* ============== RANKED MODE ============== */
 async function startRankedGame() {
-  if (!requirePlayerNameForGuest()) return;
-
   if (typeof isSignedIn === 'function' && !isSignedIn()) {
     if (typeof signInWithGoogle === 'function') {
       signInWithGoogle();
@@ -961,27 +974,23 @@ function renderHomeStats() {
   if (!footerStats) return;
 
   const signedIn = typeof isSignedIn === 'function' && isSignedIn();
-  if (signedIn) {
-    const player = typeof getDisplayName === 'function' ? getDisplayName() : "Hráč";
-    footerStats.innerHTML = s.gamesPlayed
-      ? 'Hráč: <b>' + escapeHtml(player) + '</b> · Odehráno: <b>' + s.gamesPlayed + '</b> · Nejlepší skóre: <b>' + s.bestScore + '</b> · Viděno otázek: <b>' + seenCount + '</b>'
-      : 'Hráč: <b>' + escapeHtml(player) + '</b> · Zatím jsi nehrál. Pusť se do toho! 🚀';
-  } else {
-    footerStats.innerHTML = s.gamesPlayed
-      ? 'Vybral jsi už pár her. Pokračuj ve Solo režimu nebo se přihlas pro Ranked.'
-      : 'Žádná historie není. Vyber režim nahoře a pusť se rovnou do hry.';
-  }
+  // Do not display player name; keep stats generic
+  footerStats.innerHTML = s.gamesPlayed
+    ? 'Odehráno: <b>' + s.gamesPlayed + '</b> · Nejlepší skóre: <b>' + (s.bestScore || 0) + '</b> · Viděno otázek: <b>' + seenCount + '</b>'
+    : 'Zatím jsi nehrál. Vyber režim nahoře a pusť se rovnou do hry.';
 
-  const changePlayerBtn = document.querySelector('#btn-change-player');
-  if (changePlayerBtn) {
-    changePlayerBtn.style.display = signedIn ? '' : 'none';
-  }
+  // change-player button removed from markup; nothing to do here
 }
 
 /* ============== NAVIGACE A NASTAVENÍ ============== */
 $$(".mode-card").forEach(c => c.onclick = () => {
   audio.click();
-  startGame(c.dataset.mode);
+  const mode = c.dataset.mode;
+  if (mode === 'leaderboard') {
+    renderLeaderboard();
+    return;
+  }
+  startGame(mode);
 });
 
 $$("[data-go]").forEach(b => b.onclick = () => {
@@ -1028,15 +1037,7 @@ $("#btn-reset-pool").onclick = () => {
   alert("Paměť otázek vymazána – znovu uvidíš celou banku.");
 };
 
-$("#btn-leaderboard").onclick = () => {
-  audio.click();
-  renderLeaderboard();
-};
-
-$("#btn-change-player").onclick = () => {
-  audio.click();
-  changePlayerName();
-};
+// Removed change player UI - button intentionally removed from markup
 
 const clearBtn = document.querySelector('#btn-clear-leaderboard');
 if (clearBtn) {
@@ -1111,7 +1112,7 @@ if (isAppRoute) {
 /* ============== REGISTRACE SERVICE WORKERU ============== */
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js")
+    navigator.serviceWorker.register("/sw.js")
       .then(() => console.log("Service Worker zaregistrován ✅"))
       .catch((err) => console.warn("SW chyba:", err));
   });

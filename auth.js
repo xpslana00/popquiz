@@ -65,11 +65,9 @@ function updateAuthUI(user, profile) {
   currentAuthProfile = profile;
 
   const banner = document.querySelector('#auth-banner');
-  const userInfo = document.querySelector('#auth-user-info');
+  const avatarBtn = document.querySelector('#auth-avatar-btn');
   const loginBtn = document.querySelector('#btn-google-login');
   const avatarEl = document.querySelector('#auth-avatar');
-  const nameEl = document.querySelector('#auth-name');
-  const emailEl = document.querySelector('#auth-email');
 
   if (user) {
     let displayName = user.email;
@@ -85,22 +83,24 @@ function updateAuthUI(user, profile) {
     const email = user.email || '';
 
     if (avatarEl) avatarEl.textContent = avatar;
-    if (nameEl) nameEl.textContent = displayName;
-    if (emailEl) emailEl.textContent = email;
-
-    if (userInfo) userInfo.style.display = 'flex';
+    if (avatarBtn) avatarBtn.style.display = 'flex';
     if (loginBtn) loginBtn.style.display = 'none';
     if (banner) {
       banner.style.display = 'flex';
       banner.classList.remove('auth-hidden');
     }
   } else {
-    if (userInfo) userInfo.style.display = 'none';
-    if (loginBtn) loginBtn.style.display = 'none';
+    if (avatarBtn) avatarBtn.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'flex';
     if (banner) {
-      banner.style.display = 'none';
+      banner.style.display = 'flex';
       banner.classList.add('auth-hidden');
     }
+  }
+
+  // Let the app refresh any auth-dependent UI (ranked button, etc.)
+  if (typeof updateRankedButton === 'function') {
+    try { updateRankedButton(); } catch (e) { /* ignore */ }
   }
 }
 

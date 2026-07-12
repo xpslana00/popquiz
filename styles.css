@@ -72,7 +72,7 @@ body.app-shell #app {
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 26px 80px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(20px);
-  max-width: 1160px;
+  max-width: 1080px;
 }
 
 .hero::before {
@@ -693,27 +693,30 @@ body.app-shell #app {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text);
   text-decoration: none;
   font-weight: 700;
-  width: fit-content;
   margin-bottom: 18px;
+  justify-content: center;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
 }
 
 .app-top-logo {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  width: 24px;
-  height: 24px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  background: rgba(15, 156, 255, 0.12);
+  background: linear-gradient(135deg, rgba(64, 196, 255, 0.22), rgba(14, 255, 217, 0.16));
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
 }
 
 /* when the ranked button prompts login, make text white for visibility */
@@ -840,6 +843,41 @@ body.app-shell #app {
   padding-inline-start: 20px;
   max-width: calc(100% - 40px);
 }
+
+/* Position auth avatar to top-right in app shell */
+body.app-shell .auth-banner {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-btn {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.06);
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.profile-btn .auth-avatar { font-size: 16px; }
+
+body.app-shell .auth-avatar-btn {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  z-index: 20;
+}
+
+/* Ensure mode tiles use white headings where appropriate */
+.mode-card h2 { color: #fff; }
+.mode-card p { color: #c7d2e0; }
 
 .w-app-brand {
   display: inline-flex;
