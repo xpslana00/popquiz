@@ -276,8 +276,32 @@
       <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
       <h2>🏆 Žebříček</h2>
       <p class="subtitle">Lokální historie skóre na tomto zařízení</p>
+      <div id="leaderboard-summary" class="leaderboard-summary"></div>
       <div id="leaderboard-list" class="leaderboard-list"></div>
       <button id="btn-clear-leaderboard" class="ghost-btn full">🧹 Vymazat lokální historii</button>
+    </section>
+
+    <section id="screen-profile" class="screen">
+      <button class="ghost-btn back" data-go="screen-home">← Zpět</button>
+      <div class="profile-shell">
+        <div class="profile-hero">
+          <div class="profile-avatar" id="profile-avatar">👤</div>
+          <div>
+            <h2 id="profile-name">Profil</h2>
+            <p class="subtitle" id="profile-subtitle">Základní informace o hráči</p>
+          </div>
+        </div>
+
+        <div class="profile-stats" id="profile-stats"></div>
+
+        <div class="profile-history-card">
+          <div class="profile-history-head">
+            <h3>Poslední hry</h3>
+            <span id="profile-history-note">Historie skóre</span>
+          </div>
+          <div id="profile-history" class="profile-history"></div>
+        </div>
+      </div>
     </section>
 
     <section id="screen-teams-setup" class="screen">

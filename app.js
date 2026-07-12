@@ -244,11 +244,25 @@ async function renderLeaderboard() {
     const rows = await getGlobalLeaderboard(100);
 
     if (!rows || rows.length === 0) {
+      const summary = document.querySelector("#leaderboard-summary");
+      if (summary) summary.innerHTML = "";
       list.innerHTML = '<div class="empty-state">Zatím tu nikdo nemá Ranked skóre.<br>' + (isLoggedIn ? 'Buď první! Zahraj si Ranked hru.' : 'Přihlas se a buď první v žebříčku!') + '</div>';
       return;
     }
 
     const currentUserId = (typeof currentAuthUser !== 'undefined' && currentAuthUser) ? currentAuthUser.id : null;
+    const topRow = rows[0];
+    const topProfile = topRow.profiles || {};
+    const topName = formatLeaderboardName(topProfile.username || (topProfile.email ? topProfile.email.split('@')[0] : 'Anonym'));
+    const summary = document.querySelector("#leaderboard-summary");
+
+    if (summary) {
+      summary.innerHTML = '<div class="leaderboard-summary-card">' +
+        '<span class="leaderboard-summary-label">Nejvyšší score</span>' +
+        '<strong>' + escapeHtml(String(topRow.score || 0)) + ' bodů</strong>' +
+        '<span class="leaderboard-summary-meta">' + escapeHtml(topName) + ' · ' + formatDateTime(topRow.created_at) + '</span>' +
+      '</div>';
+    }
 
     list.innerHTML = rows.map((r, i) => {
       const profile = r.profiles || {};
@@ -271,7 +285,104 @@ async function renderLeaderboard() {
     }).join("");
   } catch (err) {
     console.error('Leaderboard error:', err);
+    const summary = document.querySelector("#leaderboard-summary");
+    if (summary) summary.innerHTML = "";
     list.innerHTML = '<div class="empty-state">Chyba při načítání žebříčku. Zkus obnovit stránku.</div>';
+  }
+}
+
+function getLocalGameHistory() {
+  return loadScoreHistory().slice().sort((a, b) => {
+    const aTime = new Date(a.date || 0).getTime();
+    const bTime = new Date(b.date || 0).getTime();
+    return bTime - aTime;
+  });
+}
+
+function buildProfileStats(history, label) {
+  const totalGames = history.length;
+  const totalScore = history.reduce((sum, item) => sum + (Number(item.score) || 0), 0);
+  const bestScore = history.reduce((best, item) => Math.max(best, Number(item.score) || 0), 0);
+  const averageScore = totalGames ? Math.round(totalScore / totalGames) : 0;
+  const lastGame = history[0] || null;
+
+  return {
+    totalGames,
+    totalScore,
+    bestScore,
+    averageScore,
+    lastGame,
+    label
+  };
+}
+
+async function renderProfile() {
+  const statsWrap = document.querySelector('#profile-stats');
+  const historyWrap = document.querySelector('#profile-history');
+  const nameEl = document.querySelector('#profile-name');
+  const subtitleEl = document.querySelector('#profile-subtitle');
+  const avatarEl = document.querySelector('#profile-avatar');
+  const noteEl = document.querySelector('#profile-history-note');
+
+  if (!statsWrap || !historyWrap || !nameEl || !subtitleEl || !avatarEl) return;
+
+  showScreen('screen-profile');
+
+  const signedIn = typeof isSignedIn === 'function' && isSignedIn();
+  const displayName = signedIn ? getDisplayName() : (getSavedPlayerName() || 'Host');
+  const displayAvatar = signedIn ? getDisplayAvatar() : '👤';
+
+  nameEl.textContent = displayName;
+  subtitleEl.textContent = signedIn ? 'Tvoje cloudové a lokální herní statistiky' : 'Lokální herní statistiky na tomto zařízení';
+  avatarEl.textContent = displayAvatar;
+  if (noteEl) noteEl.textContent = signedIn ? 'Ranked historie z cloudu' : 'Historie uložená lokálně';
+
+  const localHistory = getLocalGameHistory();
+  const localStats = buildProfileStats(localHistory, 'Lokálně');
+
+  let rankedHistory = [];
+  if (signedIn && typeof getMyRankedHistory === 'function') {
+    rankedHistory = await getMyRankedHistory(20);
+  }
+  const rankedStats = buildProfileStats(rankedHistory || [], 'Ranked');
+
+  const bestScore = Math.max(localStats.bestScore, rankedStats.bestScore);
+  const latestEntry = rankedStats.lastGame || localStats.lastGame || null;
+
+  const cards = [
+    { label: 'Odehrané hry', value: String(localStats.totalGames) },
+    { label: 'Nejvyšší score', value: String(bestScore) },
+    { label: 'Celkové score', value: String(localStats.totalScore) },
+    { label: 'Průměr na hru', value: String(localStats.averageScore) },
+    { label: 'Ranked hry', value: signedIn ? String(rankedStats.totalGames) : '0' }
+  ];
+
+  statsWrap.innerHTML = cards.map((card) => {
+    return '<div class="profile-stat-card">' +
+      '<span>' + escapeHtml(card.label) + '</span>' +
+      '<strong>' + escapeHtml(card.value) + '</strong>' +
+    '</div>';
+  }).join('');
+
+  const historySource = signedIn && rankedHistory.length ? rankedHistory : localHistory;
+  if (!historySource.length) {
+    historyWrap.innerHTML = '<div class="empty-state">Zatím tu není žádná uložená hra.</div>';
+    return;
+  }
+
+  historyWrap.innerHTML = historySource.slice(0, 5).map((item) => {
+    const modeLabel = getModeLabel(item.mode || 'solo');
+    return '<div class="profile-history-item">' +
+      '<div>' +
+        '<strong>' + escapeHtml(modeLabel) + '</strong>' +
+        '<span>' + escapeHtml(formatDateTime(item.date || item.created_at || '')) + '</span>' +
+      '</div>' +
+      '<b>' + escapeHtml(String(item.score || 0)) + ' bodů</b>' +
+    '</div>';
+  }).join('');
+
+  if (latestEntry && signedIn) {
+    subtitleEl.textContent += ' · Poslední hra: ' + formatDateTime(latestEntry.date || latestEntry.created_at || '');
   }
 }
 
@@ -998,6 +1109,14 @@ $$("[data-go]").forEach(b => b.onclick = () => {
   showScreen(b.dataset.go);
   renderHomeStats();
 });
+
+const profileBtn = document.querySelector('#auth-profile-btn');
+if (profileBtn) {
+  profileBtn.onclick = () => {
+    audio.click();
+    renderProfile();
+  };
+}
 
 $("#btn-restart").onclick = () => startGame(state.mode);
 
