@@ -468,7 +468,7 @@ body.app-shell #app {
   border: 1px solid var(--card-border);
   color: var(--text); font-size: 1.4rem;
   cursor: pointer; backdrop-filter: blur(10px);
-  z-index: 100;
+  z-index: 9999;
 }
 .settings-panel {
   position: fixed; bottom: 80px; right: 20px; width: 260px;
@@ -477,7 +477,7 @@ body.app-shell #app {
   border-radius: 14px;
   padding: 16px;
   display: grid; gap: 12px;
-  z-index: 100;
+  z-index: 9999;
 }
 .switch { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .switch select {
@@ -1406,7 +1406,7 @@ body.app-shell .auth-avatar-btn {
 
 .w-feature-section {
   margin-top: 6px;
-  margin-left: calc(-1 * (100vw - 100%) / 2);
+  margin-left: calc(-1 * (100vw - 100%) / 2 - 20px);
   padding: 0 20px;
   width: 100vw;
   box-sizing: border-box;
@@ -1679,7 +1679,7 @@ body.app-shell .auth-avatar-btn {
 
   .w-feature-section {
     margin-top: 2px;
-    margin-left: calc(-1 * (100vw - 100%) / 2);
+    margin-left: calc(-1 * (100vw - 100%) / 2 - 14px);
     width: 100vw;
     padding: 0 14px;
   }
