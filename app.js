@@ -1580,9 +1580,54 @@ if (isAppRoute) {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js")
-      .then(() => console.log("Service Worker zaregistrován ✅"))
+      .then((reg) => {
+        console.log("Service Worker zaregistrován ✅");
+
+        // Pokud čeká nový SW, aktivuj ho ihned
+        if (reg.waiting) {
+          reg.waiting.postMessage("skipWaiting");
+        }
+
+        reg.addEventListener("updatefound", () => {
+          const newSW = reg.installing;
+          if (!newSW) return;
+          newSW.addEventListener("statechange", () => {
+            if (newSW.state === "installed" && navigator.serviceWorker.controller) {
+              // Nová verze je připravena – pošli skipWaiting a reload
+              newSW.postMessage("skipWaiting");
+            }
+          });
+        });
+      })
       .catch((err) => console.warn("SW chyba:", err));
+
+    // Reload po aktivaci nového SW
+    let swRefreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (swRefreshing) return;
+      swRefreshing = true;
+      window.location.reload();
+    });
   });
+
+  // Po návratu do aplikace po delší pauze zkontroluj aktualizaci SW
+  const SW_CHECK_INTERVAL = 60 * 60 * 1000; // 1 hodina
+  let lastSwCheck = Date.now();
+
+  function checkSwUpdate() {
+    const now = Date.now();
+    if (now - lastSwCheck < SW_CHECK_INTERVAL) return;
+    lastSwCheck = now;
+    navigator.serviceWorker.getRegistration("/sw.js").then((reg) => {
+      if (reg) reg.update();
+    }).catch(() => {});
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") checkSwUpdate();
+  });
+
+  window.addEventListener("focus", checkSwUpdate);
 }
 
 /* ============== SYNC STATS BAR WITH AUTH ============== */

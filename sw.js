@@ -1,5 +1,5 @@
 /* ============== POPQUIZ SERVICE WORKER ============== */
-const CACHE = "popquiz-v29";
+const CACHE = "popquiz-v30";
 
 // Soubory, které se uloží do cache při instalaci
 const ASSETS = [
@@ -37,6 +37,13 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+/* ===== MESSAGE – skipWaiting na žádost klienta ===== */
+self.addEventListener("message", (event) => {
+  if (event.data === "skipWaiting") {
+    self.skipWaiting();
+  }
+});
+
 /* ===== FETCH – strategie cache ===== */
 self.addEventListener("fetch", (event) => {
   const req = event.request;
@@ -44,9 +51,24 @@ self.addEventListener("fetch", (event) => {
   // Pouze GET požadavky
   if (req.method !== "GET") return;
 
-  // Pro questions.json: nejdřív zkus síť (aby šly aktualizovat otázky),
-  // pak fallback na cache
-  if (req.url.endsWith("questions.json")) {
+  const url = new URL(req.url);
+
+  // HTML dokumenty: nejdřív síť, pak cache (aby se vždy načetla nová verze)
+  if (req.headers.get("accept") && req.headers.get("accept").includes("text/html")) {
+    event.respondWith(
+      fetch(req)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(req, copy));
+          return response;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Pro questions.json a JS/CSS soubory s ?v= parametrem: nejdřív síť, pak cache
+  if (req.url.endsWith("questions.json") || url.searchParams.has("v")) {
     event.respondWith(
       fetch(req)
         .then((response) => {
