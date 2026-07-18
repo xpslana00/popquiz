@@ -1423,6 +1423,16 @@ if (profileBtn) {
   };
 }
 
+const logoutBtn = document.querySelector('#btn-logout');
+if (logoutBtn) {
+  logoutBtn.onclick = async () => {
+    audio.click();
+    if (typeof signOut === 'function') {
+      await signOut();
+    }
+  };
+}
+
 $("#btn-restart").onclick = () => startGame(state.mode);
 
 $("#btn-add-team").onclick = () => {
