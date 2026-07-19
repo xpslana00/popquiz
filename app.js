@@ -358,6 +358,21 @@ function showScreen(id) {
     screen.setAttribute('style', 'display: block !important;');
     window.scrollTo(0, 0);
   }
+
+  updateSettingsVisibilityByScreen(id);
+}
+
+function updateSettingsVisibilityByScreen(screenId) {
+  const settingsToggle = document.querySelector('#settings-toggle');
+  const settingsPanel = document.querySelector('#settings-panel');
+  if (!settingsToggle || !settingsPanel) return;
+
+  const shouldShowSettings = screenId === 'screen-home';
+
+  settingsToggle.classList.toggle('hidden', !shouldShowSettings);
+  if (!shouldShowSettings) {
+    settingsPanel.classList.add('hidden');
+  }
 }
 
 /* ============== PLAYER + LOCAL LEADERBOARD ============== */
@@ -569,6 +584,7 @@ async function renderProfile() {
   const subtitleEl = document.querySelector('#profile-subtitle');
   const avatarEl = document.querySelector('#profile-avatar');
   const noteEl = document.querySelector('#profile-history-note');
+  const authActionsWrap = document.querySelector('#profile-auth-actions');
 
   if (!statsWrap || !historyWrap || !nameEl || !subtitleEl || !avatarEl) return;
 
@@ -613,6 +629,22 @@ async function renderProfile() {
   const historySource = signedIn && rankedHistory.length ? rankedHistory : localHistory;
   if (!historySource.length) {
     historyWrap.innerHTML = '<div class="empty-state">Zatím tu není žádná uložená hra.</div>';
+
+    if (!signedIn && authActionsWrap) {
+      authActionsWrap.innerHTML = '<button id="btn-profile-google-login" class="google-login-btn full">Přihlásit se přes Google</button>';
+      const profileLoginBtn = document.querySelector('#btn-profile-google-login');
+      if (profileLoginBtn) {
+        profileLoginBtn.onclick = () => {
+          audio.click();
+          if (typeof signInWithGoogle === 'function') {
+            signInWithGoogle();
+          }
+        };
+      }
+    } else if (authActionsWrap) {
+      authActionsWrap.innerHTML = '';
+    }
+
     return;
   }
 
@@ -629,6 +661,23 @@ async function renderProfile() {
 
   if (latestEntry && signedIn) {
     subtitleEl.textContent += ' · Poslední hra: ' + formatDateTime(latestEntry.date || latestEntry.created_at || '');
+  }
+
+  if (authActionsWrap) {
+    if (signedIn) {
+      authActionsWrap.innerHTML = '<button id="btn-profile-logout" class="primary-btn full" style="background: #f97316; margin-top: 24px;">Odhlásit se</button>';
+      const profileLogoutBtn = document.querySelector('#btn-profile-logout');
+      if (profileLogoutBtn) {
+        profileLogoutBtn.onclick = async () => {
+          audio.click();
+          if (typeof signOut === 'function') {
+            await signOut();
+          }
+        };
+      }
+    } else {
+      authActionsWrap.innerHTML = '';
+    }
   }
 }
 
@@ -1456,24 +1505,13 @@ function updateSettingsAuthButton() {
   const settingsLoginBtn = document.querySelector('#btn-settings-google-login');
   if (!settingsLoginBtn) return;
 
-  const signed = typeof isSignedIn === 'function' && isSignedIn();
   settingsLoginBtn.textContent = '👤 Můj profil';
 
-  if (signed) {
-    settingsLoginBtn.onclick = async () => {
-      audio.click();
-      $("#settings-panel").classList.add('hidden');
-      await renderProfile();
-    };
-  } else {
-    settingsLoginBtn.onclick = () => {
-      audio.click();
-      $("#settings-panel").classList.add('hidden');
-      if (typeof signInWithGoogle === 'function') {
-        signInWithGoogle();
-      }
-    };
-  }
+  settingsLoginBtn.onclick = async () => {
+    audio.click();
+    $("#settings-panel").classList.add('hidden');
+    await renderProfile();
+  };
 }
 
 $("#opt-timer").checked = state.settings.timer;
@@ -1556,6 +1594,9 @@ if (welcomeEnterBtn) {
 }
 
 updateRankedButton();
+window.updateSettingsVisibilityByScreen = updateSettingsVisibilityByScreen;
+const activeScreenAtLoad = document.querySelector('.screen.active');
+updateSettingsVisibilityByScreen(activeScreenAtLoad ? activeScreenAtLoad.id : '');
 
 if (typeof sb !== 'undefined' && sb.auth) {
   sb.auth.onAuthStateChange(() => {

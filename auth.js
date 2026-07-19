@@ -260,6 +260,9 @@ function showWelcomeScreen() {
     home.classList.remove('active');
     home.setAttribute('style', 'display: none !important;');
   }
+  if (typeof updateSettingsVisibilityByScreen === 'function') {
+    updateSettingsVisibilityByScreen('screen-welcome');
+  }
 }
 
 function hideWelcomeScreen() {
@@ -274,6 +277,9 @@ function hideWelcomeScreen() {
   }
   window.scrollTo(0, 0);
   localStorage.setItem(WELCOME_KEY, '1');
+  if (typeof updateSettingsVisibilityByScreen === 'function') {
+    updateSettingsVisibilityByScreen('screen-home');
+  }
 }
 
 function shouldShowWelcome() {
